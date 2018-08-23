@@ -68,7 +68,7 @@ int main()
       R0p = 0;
 
       //Convert parameter set to char, save text file
-      NPar = 1 ;
+      NPar = 2 ;
       sprintf(numstr, "%d", NPar);
       out_data.open(numstr);
       out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Place these names in the open file

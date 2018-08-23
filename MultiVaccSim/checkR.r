@@ -1,4 +1,4 @@
-datname = 'DownPhase'
+datname = '2'
 dat = read.table(file = datname, header = T, sep = " ")
 names(dat)
 
