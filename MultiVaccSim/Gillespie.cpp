@@ -103,7 +103,7 @@ int main()
       for(int ntrial = 0; ntrial < NTrials; ntrial++)
 	{	  
 	  //Set initial conditions  
-	  t = 0;
+	  t = 0.0;
 	  S = (int) 1000 ; 
 	  Iv = (int) 0;
 	  Ip = (int) 100;
@@ -314,7 +314,18 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
 	Npop_next = Npop;
 	nrecp += 1;
       }
-    
+        
+    //Update current state and time
+    S = S_next;
+    Iv = Iv_next;
+    Ip = Ip_next;
+    V = V_next;
+    P = P_next;
+    Npop = Npop_next;
+      
+  } // End If (EventFlag)
+      
+
     //Write old values
     if( t >= ti )
       {
@@ -326,18 +337,6 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
 	//ninf = 0;
 	//nrec = 0;
       }
-
-    
-    //Update current state and time
-    S = S_next;
-    Iv = Iv_next;
-    Ip = Ip_next;
-    V = V_next;
-    P = P_next;
-    Npop = Npop_next;
-      
-  } // End If (EventFlag)
-      
       
     t += dTime;
 

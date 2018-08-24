@@ -2,7 +2,7 @@
 require(deSolve)
 source('Tools/Functions.r', local = TRUE)
 tvvals = seq(0,365,length.out = 10)
-parms = expand.grid(b0 = 400, tb = 90, tv = tvvals, d = 0.004, T = 365, Bp = 0.0000005, gamp = 0.005, gamv = 0.07, NVacc = 5000)
+parms = expand.grid(b0 = 400, tb = 90, tv = tvvals, d = 0.004, T = 365, Bp = 0.0000005, gamp = 0.005, gamv = 0.07, NVacc = 5000, IpAvg = 0, MaxTimeIp = 0)
 times = seq(0,10000)
 y0 = c(1000, 0, 100, 0, 00)
 names(y0) = c('S','Iv','Ip','V','P')
@@ -12,6 +12,7 @@ timeseq  <- seq(0,maxtimes, by = 0.01)
 
 ###Get statistic to graph (average)
 NPars <- nrow(parms)
+ExtTimesList = list()
 for(NPar in 1:NPars){
     print(paste("NPar:", NPar))
     datname = paste("Data/NPar_", NPar-1, sep = '')
@@ -27,7 +28,24 @@ for(NPar in 1:NPars){
                    events=list(func = vaccinate, time=vacctimes),
                    maxsteps = 100000))
 
-pdf(file = paste(datname,'Tv_',round(tvval), ".pdf",sep = ""))
+    ###Calculate statistic (average)
+    fode.Ip = approxfun(out$time, out$Ip)
+        
+    ###Recast stochastic data    
+    startind = c(which(dat$time==0),nrow(dat))
+    datlist = list()
+    ExtTimes = c()
+    for(i in 1:(length(startind)-1)){
+    	  dati = dat[startind[i]:(startind[i+1] - 1),]
+    	  datlist[[i]] = dati
+	  ExtTimei = dati$time[max(which(dati$Ip > 0))]
+	  ExtTimes =  c(ExtTimes,ExtTimei)
+#	  parms$MaxTimeIp[i] = mean(ExtTimes[i])
+    }
+ 
+ExtTimesList[[NPar]] = ExtTimes
+
+#pdf(file = paste(datname,'Tv_',round(tvval), ".pdf",sep = ""))
 plot(S~time, out, xlim = c(0,365*5), ylim = c(0,50000), type = 'l', lwd = 4)
 lines(Iv~time, out, col = 'green', lty = 1, lwd = 4)
 lines(Ip~time, out, col = 'red', lty = 1, lwd = 4)
@@ -44,7 +62,7 @@ points(P~time, dat[these,], col = 'pink', cex = 1, pch = 3)
 
 abline(v = vacctimes, lty = 3)
 
-dev.off()
+#dev.off()
 
 }
 
