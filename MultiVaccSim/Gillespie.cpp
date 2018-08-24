@@ -1,14 +1,10 @@
-/*To do: 
-Gillespie.cpp: 
--Add in multiple trials
-*/
-
 
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
 model. The simulation procedes according
 to the Gillespie algorithm.  
+
 */
 
 #include <iostream> // input/output cout, cin
@@ -17,16 +13,19 @@ to the Gillespie algorithm.
 #include <time.h>
 #include <fstream> //Used to open files to which data are saved
 #include <string>
+#include <vector>
 
 using namespace std;
 
+
 //VARIABLES
 bool EventFlag;
-int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, NVacc, NTrials, NPar;
+int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop,
+  nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death,
+  V_death, P_death, NVacc, NTrials, NVals, NPar, NPars;
 std::string filepre = "npar_";
-char FileName[50], numstr[21];
-double b0, tb, Tb, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
-const double pi = 3.1415926535;
+double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath,
+  Picker, Sum, dTime, t, Tmax, tick, ti;
 
 ofstream out_data;
 
@@ -35,61 +34,89 @@ double Rand () ;
 double BirthRate ( double ) ;
 int VaccFun ( int, int ) ;
 void OneSim (int, int, int, int, int) ;
+vector<double> Seq(double , double , int );
+
+
+
+  //************//
+  // PARAMETERS //
+  //************//
+  /*
+  b0 ~ birth rate during birth period
+  d  ~ death rate
+
+  
+  Nv ~ number of vaccines used
+  tv ~ time of vaccination
+
+  tb ~ duration of birth period
+  T  ~ interval between birth periods
+  
+  */
 
 //MAIN
 int main()
 {
-
+  //Set simulation parameters
+  Tmax = (double) 5*365; //Maximum simulation time
+  dTime = 0.001; //Time increment
+  NTrials = 25; //Perform the Gillespie simulation NTrials times for each parameter set
+  NVals = 10; //Number of parameter values to loop through
+  tick = 7;   //Write data after each (simulation) time interval tick
+  
+  //Choose parameters that are VARIED. 
+  vector<double> TvVals (NVals);
+  TvVals = Seq(1, 364, NVals);
+  
+  NPars = TvVals.size();            
   srand ( time(NULL) );
-
-      //************//
-      // PARAMETERS //
-      //************//
   
-      //Set simulation parameters
-      Tmax = (double) 10*365;
-      dTime = 0.001;
-      NTrials = 100;
-  
-      //Set biological parameters
+  //Convert parameter set to char, save text file
+  for(NPar = 0; NPar < NPars ; NPar++)
+    {
+      //Choose fixed parameters: Set biological parameters
       b0 = 400;
       tb = 90;
-      Tb = 365;
+      T  = 365;
       d = 0.004;
-
+      
       //VACCINATION
       NVacc = 5000;
-      tv = 180;
       gamv = 0.07;
+      tv = TvVals[NPar];
       
       //PATHOGEN
       Bp = 0.0000005;
       gamp = 0.005;
       R0p = 0;
 
-      //Convert parameter set to char, save text file
-      NPar = 2 ;
-      sprintf(numstr, "%d", NPar);
-      out_data.open(numstr);
+      char FileName[50];
+      sprintf(FileName, "Data/NPar_%d",NPar);
+
+      out_data.open(FileName);
       out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Place these names in the open file
-      
-  for(int ntrial = 0; ntrial < NTrials; ntrial++)
-    {
-            
-      //Set initial conditions  
-      t = 0;
-      S = (int) 1000 ; 
-      Iv = (int) 0;
-      Ip = (int) 100;
-      P = (int) 0;
-      V = (int) 0;
-      
-      OneSim(S, Iv, Ip, P, V);
 
-      cout << "Sim Trial: " << ntrial << endl;
+      cout << "************" << endl;
+      cout << "Parameter: " << NPar << endl;
+      cout << "************" << endl;
       
-    }//End loop through NTrials
-
+      for(int ntrial = 0; ntrial < NTrials; ntrial++)
+	{	  
+	  //Set initial conditions  
+	  t = 0;
+	  S = (int) 1000 ; 
+	  Iv = (int) 0;
+	  Ip = (int) 100;
+	  P = (int) 0;
+	  V = (int) 0;
+	  
+	  OneSim(S, Iv, Ip, P, V);
+	  
+	  cout << "Sim Trial: " << ntrial << endl;
+	  
+	}//End loop through NTrials
+      out_data.close();
+    }//End loop through NPars     
 }//End Main
 
 
@@ -101,20 +128,19 @@ int main()
 
 void OneSim (int S, int Iv, int Ip, int P, int V)
 {
-
+  
   Npop = S + Iv + Ip + P + V;
   
   //Define Structure for storing data
-    
+  
   //  cout << "d: " << d << "\n";
   //cout << "S0: " << S << "; Iv0: " << Iv << "; Ip0: " << Ip << "; V0: " << V << "; P0: " << P << "\n" << "\n"; 
   
-  tick = 1; //This program writes data after each time interval tick
   ti = 0; // Works with tick
-
+  
   nbirths = 0;
   ndeaths = 0;
-
+  
   ninfv = 0;
   ninfp = 0;
   
@@ -152,7 +178,7 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
     Sum = 0;
 
     //Vaccination: this is assumed to be a sudden pulse
-    if ( (fmod(t,Tb) <= tv) && (fmod(t + dTime,Tb) > tv ) )
+    if ( (fmod(t,T) <= tv) && (fmod(t + dTime,T) > tv ) )
       {
 	//	cout << "vacc" << "\n";
 	S_next = S - VaccFun(S,Npop);
@@ -321,7 +347,17 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
 
 
 
-//Function returning a random number between 0 and 1
+//Birth function
+ double BirthRate( double time ) {
+   //Local function declaration
+   double result;
+   double modtime;
+   modtime = fmod(time, T ) ;
+   result = b0*(modtime < tb) ;
+   return result;
+ }
+
+//Random number function
 double Rand (){
   double unif;
   unif = 0;
@@ -332,15 +368,16 @@ double Rand (){
   return unif;
 }  
 
-//Birth function
- double BirthRate( double time ) {
-   //Local function declaration
-   double result;
-   double modtime;
-   modtime = fmod(time, Tb ) ;
-   result = b0*(modtime < tb) ;
-   return result;
- }
+//Sequence function
+vector<double> Seq(double minval, double maxval, int lengthval) {
+  vector<double> vec(lengthval);
+  for(int seqindex = 0; seqindex < lengthval; seqindex++)
+    {
+      vec[seqindex] = minval + (double) seqindex/(lengthval-1)*(maxval-minval);\
+
+    }
+  return vec;
+}
 
 //Vaccination function
 int VaccFun( int S, int Npop) {
@@ -358,3 +395,6 @@ int VaccFun( int S, int Npop) {
   result = min( numvacc , S ) ;
   return result;
 }
+
+
+
