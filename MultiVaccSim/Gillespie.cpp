@@ -1,8 +1,3 @@
-/*To do: 
-Gillespie.cpp: 
--Add in multiple trials
-*/
-
 
 /*
 Build a simple c++ script that will 
@@ -16,25 +11,29 @@ to the Gillespie algorithm.
 #include <stdlib.h>
 #include <time.h>
 #include <fstream> //Used to open files to which data are saved
-#include <string>
+#include <vector> 
 
 using namespace std;
 
 //VARIABLES
 bool EventFlag;
-int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, NVacc, NTrials, NPar;
-std::string filepre = "npar_";
-char FileName[50], numstr[21];
-double b0, tb, Tb, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
+int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar;
+char FileNamePar[50] = "Data/ParMat";
+char FileNameDat[50]= "Data/DatMat";
+double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
 const double pi = 3.1415926535;
 
 ofstream out_data;
 
 //FUNCTION DECLARATIONS
-double Rand () ;
 double BirthRate ( double ) ;
-int VaccFun ( int, int ) ;
+int Initialize(double **arr, int NCol); //Fills ParMat, returns #Rows
 void OneSim (int, int, int, int, int) ;
+double Rand () ;
+vector<double> Seq(double, double, int);//Returns sequence
+void Show(int i, double **arr, int NRow, int NCol); //Shows ith row of ParMat
+int VaccFun ( int, int ) ;
+void WriteParMat(double **arr, int NRow, int NCol); 
 
 //MAIN
 int main()
@@ -42,75 +41,76 @@ int main()
 
   srand ( time(NULL) );
 
-      //************//
-      // PARAMETERS //
-      //************//
-  
-      //Set simulation parameters
-      Tmax = (double) 10*365;
-      dTime = 0.001;
-      NTrials = 100;
-  
-      //Set biological parameters
-      b0 = 400;
-      tb = 90;
-      Tb = 365;
-      d = 0.004;
-
-      //VACCINATION
-      NVacc = 5000;
-      tv = 180;
-      gamv = 0.07;
+      //Simulation parameters
+      Tmax = (double) 10*365; dTime = 0.001; NTrials = 5;
+      int NCol = 10; //# columns (parameters)
+      //Assign pointer to 2D array
+      double **ParMat=new double*[NCol];
+      //Fill 2D array with values
+      int NRow = Initialize(ParMat, NCol);
+      WriteParMat(ParMat, NRow, NCol); //Write ParMat
       
-      //PATHOGEN
-      Bp = 0.0000005;
-      gamp = 0.005;
-      R0p = 0;
+      for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
+	{
+	  //Extract parameters
+	  b0 = ParMat[1][NPar]; //b0
+	  d = ParMat[2][NPar]; //d
+	  Bp = ParMat[3][NPar]; //Bp
+	  Nv = ParMat[4][NPar]; //Nv
+	  tv = ParMat[5][NPar]; //tv
+	  gamv = ParMat[6][NPar]; //gamv
+	  gamp = ParMat[7][NPar]; //gamp
+	  tb = ParMat[8][NPar]; //tb
+	  T = ParMat[9][NPar]; //T
 
-      //Convert parameter set to char, save text file
-      NPar = 2 ;
-      sprintf(numstr, "%d", NPar);
-      out_data.open(numstr);
-      out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Place these names in the open file
-      
-  for(int ntrial = 0; ntrial < NTrials; ntrial++)
-    {
-            
-      //Set initial conditions  
-      t = 0;
-      S = (int) 1000 ; 
-      Iv = (int) 0;
-      Ip = (int) 100;
-      P = (int) 0;
-      V = (int) 0;
-      
-      OneSim(S, Iv, Ip, P, V);
-
-      cout << "Sim Trial: " << ntrial << endl;
-      
-    }//End loop through NTrials
-
+	  //Write data (1st row)
+	  sprintf(FileNameDat, "Data/NPar_%d", NPar);
+	  out_data.open(FileNameDat);
+	  out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Write data
+	  
+	  for(int ntrial = 0; ntrial < NTrials; ntrial++)
+	    {
+	      
+	      //Set initial conditions  
+	      t = 0;
+	      S = (int) 1000 ; 
+	      Iv = (int) 0;
+	      Ip = (int) 100;
+	      P = (int) 0;
+	      V = (int) 0;
+	      
+	      OneSim(S, Iv, Ip, V, P);
+	      
+	      cout << "Sim Trial: " << ntrial << endl;
+	      
+	    }//End loop through NTrials
+	  out_data.close();
+	  
+	  cout << "*****************************" << endl;	  
+	  cout << "Finished Parameter Set " << NPar+1 << " / " << NRow << endl;
+	  cout << "*****************************" << endl;
+	  
+	}//End Loop through NPars
+      //Remove ParMat
+      for (int j=0; j<NCol; j++)
+	delete [] ParMat[j];
+      delete [] ParMat;
 }//End Main
 
-
-
+      
+      
 //////////////////////////////////////
 ///////// DEFINE FUNCTIONS ///////////
 //////////////////////////////////////
 
 
-void OneSim (int S, int Iv, int Ip, int P, int V)
+void OneSim (int S, int Iv, int Ip, int V, int P)
 {
 
-  Npop = S + Iv + Ip + P + V;
-  
-  //Define Structure for storing data
+  Npop = S + Iv + Ip + V + P;
     
-  //  cout << "d: " << d << "\n";
-  //cout << "S0: " << S << "; Iv0: " << Iv << "; Ip0: " << Ip << "; V0: " << V << "; P0: " << P << "\n" << "\n"; 
-  
   tick = 1; //This program writes data after each time interval tick
-  ti = 0; // Works with tick
+  ti = 0;   // Works with tick
 
   nbirths = 0;
   ndeaths = 0;
@@ -152,7 +152,7 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
     Sum = 0;
 
     //Vaccination: this is assumed to be a sudden pulse
-    if ( (fmod(t,Tb) <= tv) && (fmod(t + dTime,Tb) > tv ) )
+    if ( (fmod(t,T) <= tv) && (fmod(t + dTime,T) > tv ) )
       {
 	//	cout << "vacc" << "\n";
 	S_next = S - VaccFun(S,Npop);
@@ -292,13 +292,10 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
     //Write old values
     if( t >= ti )
       {
-  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; //Write current values    
-  //cout << "Time: " << t << endl; //"; check sum: " << (Sum + gamp*Ip) / Sum_rate << "Check R " << P << endl; 
+  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	ti = ti + tick;
 	nbirths = 0;
 	ndeaths = 0;
-	//ninf = 0;
-	//nrec = 0;
       }
 
     
@@ -337,7 +334,7 @@ double Rand (){
    //Local function declaration
    double result;
    double modtime;
-   modtime = fmod(time, Tb ) ;
+   modtime = fmod(time, T ) ;
    result = b0*(modtime < tb) ;
    return result;
  }
@@ -352,9 +349,83 @@ int VaccFun( int S, int Npop) {
     {
       temp = 0;
     }else{
-    temp  = (double) NVacc*S/(Npop) ;
+    temp  = (double) Nv*S/(Npop) ;
   }
   numvacc = round( temp );
   result = min( numvacc , S ) ;
   return result;
+}
+
+//************************************
+//function to Initialize values of 2D array
+int Initialize(double **arr, int NCol)
+{
+  //Choose variable values to fill array with
+  vector<double> tvVals;
+  vector<double> BpVals;
+  tvVals = Seq(1, 364, 25);
+  BpVals = Seq(0.000005,0.00001, 1);
+  int NRow = (int)tvVals.size()* (int)BpVals.size();
+
+  //Allocate memory for the array
+  for(int j=0; j<NCol; j++)
+    {
+      arr[j]=new double[NRow];
+    }
+  //Fixed parameters
+  int i;
+
+  for(int i1=0; i1<tvVals.size(); i1++)
+    {
+      for(int i2=0; i2<BpVals.size(); i2++)
+	{
+	  i = i1*BpVals.size() + i2;
+	  arr[0][i] = i; //NPar
+	  arr[1][i] = 100.0;   //b0
+	  arr[2][i] = 0.004; //d
+	  arr[3][i] = BpVals[i2]; //Bp
+	  arr[4][i] = 5000.0; //Nv
+	  arr[5][i] = tvVals[i1]; //tv
+	  arr[6][i] = 0.007; //gamv
+	  arr[7][i] = 0.007; //gamp
+	  arr[8][i] = 300.0; //tb
+	  arr[9][i] = 365.0; //T
+	}
+    }
+  return i+1; //Return total NUMBER of rows (hence +1)
+}
+
+//************************************
+//function to write values of 2D array
+void WriteParMat(double **arr, int NRow, int NCol)
+{
+  out_data.open(FileNamePar);
+  out_data << "NPar b0 d Bp Nv tv gamv gamp tb T\n"; //Write header
+  int i,j;
+  for(i=0; i<NRow;i++)
+    {
+      for(j=0; j<NCol; j++)
+	{
+	  out_data << arr[j][i] << " "; //Write data
+	}
+      out_data << endl;
+    }
+  out_data.close();
+}
+
+
+//************************************
+//function that returns a sequence from minval to maxval, and of length lengthval
+vector<double> Seq(double minval, double maxval, int lengthval) {
+  vector<double> vec(lengthval);
+  if(lengthval==1)
+    {
+      vec[0] = minval;
+    }else{
+  for(int seqindex = 0; seqindex < lengthval; seqindex++)
+    {
+      vec[seqindex] = minval + (double) seqindex/(lengthval-1)*(maxval-minval);
+    }
+  }
+  return vec;
 }
