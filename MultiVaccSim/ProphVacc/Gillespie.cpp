@@ -13,6 +13,8 @@ of a zoonotic pathogen.
 #include <time.h>
 #include <fstream> //Used to open files to which data are saved
 #include <vector> 
+#include <string.h>
+#include <sys/stat.h> // mkdir
 
 using namespace std;
 
@@ -22,7 +24,7 @@ char SimName[50] = "Sim";
 bool EventFlag;
 int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar, PInit;
 int State[5];
-char FileNamePar[50], FileNameDat[50], FileSuffix[50];
+char FileNamePar[50], FileSuffix[50], FileNameDat[50], DirName[50];
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, TMax, tick, ti, TPathInv;
 const double pi = 3.1415926535;
 ofstream out_data;
@@ -56,12 +58,15 @@ int main()
       
       for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
 	{
+
+	  strcpy(DirName, "Data/");
+	  strcat(DirName, SimName);  
+	  mkdir(DirName, ACCESSPERMS);
+	  strcat(DirName, "/");
 	  
-	  strcpy(FileNameDat, "Data/");
-	  strcat(FileNameDat, SimName);  
-	  sprintf(FileSuffix, "_Npar_%d",NPar);
+	  strcpy(FileNameDat, DirName);
+	  sprintf(FileSuffix, "Npar_%d",NPar);
 	  strcat(FileNameDat, FileSuffix);
-	  cout << FileNameDat << endl;
 
 	  //Extract parameters
 	  //Parmat[0] corresponds to NPar;
@@ -415,7 +420,6 @@ int Initialize(double **arr, int NCol)
     for(int i2=0; i2<BpVals.size(); i2++)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
 	{
-	  i++;
 	  arr[0][i] = i; //NPar
 	  arr[1][i] = 100.0;   //b0
 	  arr[2][i] = 0.004; //d
@@ -428,6 +432,7 @@ int Initialize(double **arr, int NCol)
 	  arr[9][i] = 365.0; //T
 	  arr[10][i] = 5; //PInit
 	  arr[11][i] = TPathInvVals[i3]; //TPathInv
+	  i++;
 	}
   return i+1; //Return total NUMBER of rows (hence +1)
 }
