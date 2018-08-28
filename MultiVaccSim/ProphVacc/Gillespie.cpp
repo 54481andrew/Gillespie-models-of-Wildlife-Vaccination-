@@ -1,4 +1,3 @@
-
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
@@ -17,12 +16,13 @@ of a zoonotic pathogen.
 
 using namespace std;
 
-//VARIABLES
+//USER-ASSIGNED VARIABLES
+char SimName[50] = "Sim";
+//OTHER VARIABLES
 bool EventFlag;
 int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar, PInit;
 int State[5];
-char FileNamePar[50] = "Data/ParMat";
-char FileNameDat[50]= "Data/DatMat";
+char FileNamePar[50], FileNameDat[50], FileSuffix[50];
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, TMax, tick, ti, TPathInv;
 const double pi = 3.1415926535;
 ofstream out_data;
@@ -40,6 +40,8 @@ void WriteParMat(double **arr, int NRow, int NCol);
 //MAIN
 int main()
 {
+  strcpy(FileNamePar, "Data/ParMat_");
+  strcat(FileNamePar, SimName);  
 
   srand ( time(NULL) );
 
@@ -54,6 +56,13 @@ int main()
       
       for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
 	{
+	  
+	  strcpy(FileNameDat, "Data/");
+	  strcat(FileNameDat, SimName);  
+	  sprintf(FileSuffix, "_Npar_%d",NPar);
+	  strcat(FileNameDat, FileSuffix);
+	  cout << FileNameDat << endl;
+
 	  //Extract parameters
 	  //Parmat[0] corresponds to NPar;
 	  b0 = ParMat[1][NPar]; //b0
@@ -69,7 +78,6 @@ int main()
 	  TPathInv = ParMat[11][NPar]; // Time of pathogen invasion
 
 	  //Write data (1st row)
-	  sprintf(FileNameDat, "Data/NPar_%d", NPar);
 	  out_data.open(FileNameDat);
 	  out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Write data
 	  
@@ -117,8 +125,8 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
   S = State[0];
   Iv =State[1];
   Ip =State[2];
-  P = State[3];
-  V = State[4];
+  V = State[3];
+  P = State[4];
   Npop = S + Iv + Ip + V + P;
 
   double t = StartTime;
@@ -415,7 +423,7 @@ int Initialize(double **arr, int NCol)
 	  arr[8][i] = 300.0; //tb
 	  arr[9][i] = 365.0; //T
 	  arr[10][i] = 5; //PInit
-	  arr[11][i] = 1; //TPathInv
+	  arr[11][i] = 5*365; //TPathInv
 	}
     }
   return i+1; //Return total NUMBER of rows (hence +1)

@@ -3,7 +3,9 @@
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
 model. The simulation procedes according
-to the Gillespie algorithm.  
+to the Gillespie algorithm, and simulates 
+the use of vaccination to prevent the invasion
+of a zoonotic pathogen. 
 */
 
 #include <iostream> // input/output cout, cin
@@ -17,22 +19,22 @@ using namespace std;
 
 //VARIABLES
 bool EventFlag;
-int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar;
+int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar, PInit;
+int State[5];
 char FileNamePar[50] = "Data/ParMat";
 char FileNameDat[50]= "Data/DatMat";
-double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
+double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, TMax, tick, ti, TPathInv;
 const double pi = 3.1415926535;
-
 ofstream out_data;
 
 //FUNCTION DECLARATIONS
 double BirthRate ( double ) ;
 int Initialize(double **arr, int NCol); //Fills ParMat, returns #Rows
-void OneSim (int, int, int, int, int) ;
+void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad);
 double Rand () ;
-vector<double> Seq(double, double, int);//Returns sequence
+vector<double> Seq(double, double, int); //Returns sequence
 void Show(int i, double **arr, int NRow, int NCol); //Shows ith row of ParMat
-int VaccFun ( int, int ) ;
+int VaccFun ( int, int );
 void WriteParMat(double **arr, int NRow, int NCol); 
 
 //MAIN
@@ -42,8 +44,8 @@ int main()
   srand ( time(NULL) );
 
       //Simulation parameters
-      Tmax = (double) 10*365; dTime = 0.001; NTrials = 5;
-      int NCol = 10; //# columns (parameters)
+      TMax = (double) 10*365; dTime = 0.001; NTrials = 5;
+      int NCol = 12; //# columns (parameters)
       //Assign pointer to 2D array
       double **ParMat=new double*[NCol];
       //Fill 2D array with values
@@ -53,6 +55,7 @@ int main()
       for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
 	{
 	  //Extract parameters
+	  //Parmat[0] corresponds to NPar;
 	  b0 = ParMat[1][NPar]; //b0
 	  d = ParMat[2][NPar]; //d
 	  Bp = ParMat[3][NPar]; //Bp
@@ -62,6 +65,8 @@ int main()
 	  gamp = ParMat[7][NPar]; //gamp
 	  tb = ParMat[8][NPar]; //tb
 	  T = ParMat[9][NPar]; //T
+	  PInit = (int) ParMat[10][NPar]; // Initial level of pathogen upon invasion
+	  TPathInv = ParMat[11][NPar]; // Time of pathogen invasion
 
 	  //Write data (1st row)
 	  sprintf(FileNameDat, "Data/NPar_%d", NPar);
@@ -70,17 +75,18 @@ int main()
 	  
 	  for(int ntrial = 0; ntrial < NTrials; ntrial++)
 	    {
-	      
-	      //Set initial conditions  
-	      t = 0;
-	      S = (int) 1000 ; 
-	      Iv = (int) 0;
-	      Ip = (int) 100;
-	      P = (int) 0;
-	      V = (int) 0;
-	      
-	      OneSim(S, Iv, Ip, V, P);
-	      
+	      State[0] = 1000; //S
+	      State[1] = 0; //Iv
+	      State[2] = 0; //Ip
+	      State[3] = 0; //V
+	      State[4] = 0; //P
+	      //Simulate to quasi steady state (rewrites State)
+	      	      OneSim(0, TPathInv, State, false);
+
+	      //Simulate invasion until TMax years
+	      State[2] = PInit;
+	      	      OneSim(TPathInv, TMax, State, true);
+
 	      cout << "Sim Trial: " << ntrial << endl;
 	      
 	    }//End loop through NTrials
@@ -91,6 +97,7 @@ int main()
 	  cout << "*****************************" << endl;
 	  
 	}//End Loop through NPars
+
       //Remove ParMat
       for (int j=0; j<NCol; j++)
 	delete [] ParMat[j];
@@ -104,30 +111,34 @@ int main()
 //////////////////////////////////////
 
 
-void OneSim (int S, int Iv, int Ip, int V, int P)
+void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = false)
 {
-
+  //Set initial conditions: No Pathogen, no vaccination
+  S = State[0];
+  Iv =State[1];
+  Ip =State[2];
+  P = State[3];
+  V = State[4];
   Npop = S + Iv + Ip + V + P;
-    
+
+  double t = StartTime;
   tick = 1; //This program writes data after each time interval tick
   ti = 0;   // Works with tick
 
+  //Track births, deaths, recoveries, etc for error checking
   nbirths = 0;
   ndeaths = 0;
-
   ninfv = 0;
   ninfp = 0;
-  
   nrecv = 0;
   nrecv = 0;
-  
   S_death = 0;
   Iv_death = 0;
   Ip_death = 0;
   V_death = 0;
   P_death = 0;
   
-  while(t < Tmax && Ip > 0) {
+  while(t < EndTime && (Ip > 0 || !StopOnErad)) {
         
     /*
       Update the state variables S, Ip, P
@@ -309,15 +320,21 @@ void OneSim (int S, int Iv, int Ip, int V, int P)
       
   } // End If (EventFlag)
       
-      
     t += dTime;
-
   }//End While
 
+  //Update state vector
+  State[0] = S;
+  State[1] = Iv;
+  State[2] = Ip;
+  State[3] = V;
+  State[4] = P;
 }//End OneSim
 
 
 
+
+//************************************
 //Function returning a random number between 0 and 1
 double Rand (){
   double unif;
@@ -329,6 +346,9 @@ double Rand (){
   return unif;
 }  
 
+
+
+//************************************
 //Birth function
  double BirthRate( double time ) {
    //Local function declaration
@@ -339,6 +359,8 @@ double Rand (){
    return result;
  }
 
+
+//************************************
 //Vaccination function
 int VaccFun( int S, int Npop) {
   int result;
@@ -356,6 +378,8 @@ int VaccFun( int S, int Npop) {
   return result;
 }
 
+
+
 //************************************
 //function to Initialize values of 2D array
 int Initialize(double **arr, int NCol)
@@ -363,7 +387,7 @@ int Initialize(double **arr, int NCol)
   //Choose variable values to fill array with
   vector<double> tvVals;
   vector<double> BpVals;
-  tvVals = Seq(1, 364, 25);
+  tvVals = Seq(1, 364, 1);
   BpVals = Seq(0.000005,0.00001, 1);
   int NRow = (int)tvVals.size()* (int)BpVals.size();
 
@@ -390,6 +414,8 @@ int Initialize(double **arr, int NCol)
 	  arr[7][i] = 0.007; //gamp
 	  arr[8][i] = 300.0; //tb
 	  arr[9][i] = 365.0; //T
+	  arr[10][i] = 5; //PInit
+	  arr[11][i] = 1; //TPathInv
 	}
     }
   return i+1; //Return total NUMBER of rows (hence +1)
@@ -400,7 +426,7 @@ int Initialize(double **arr, int NCol)
 void WriteParMat(double **arr, int NRow, int NCol)
 {
   out_data.open(FileNamePar);
-  out_data << "NPar b0 d Bp Nv tv gamv gamp tb T\n"; //Write header
+  out_data << "NPar b0 d Bp Nv tv gamv gamp tb T PInit TPathInv\n"; //Write header
   int i,j;
   for(i=0; i<NRow;i++)
     {

@@ -1,4 +1,4 @@
-datname = 'test'
+datname = "test"
 parmat = read.table(file = "Data/ParMat", header = T)
 
 require(deSolve)
@@ -10,6 +10,28 @@ names(y0) = c('S','Iv','Ip','V','P')
 
 maxtimes <- 365*10
 timeseq  <- seq(0,maxtimes, by = 0.01)
+
+
+	 
+    i = 1
+    VaccPer        <- parmat$T[i]
+    NVacc          <- parmat$Nv[i]    
+    tv <- parmat$tv[i]
+    vacctimes <- seq(tv, maxtimes,by = VaccPer)
+    
+    print(paste("NPar:", i-1))
+    datname = paste("Data/NPar_", i-1, sep = '')
+    dat = read.table(file = datname, header = T, sep = " ")
+    
+    these <- seq(1,nrow(dat), by = 1)
+    plot(S~time, dat[these,], col = 'black', cex = 1, pch = 3, xlim = c(0,10), ylim = c(0,10))
+    points(Iv~time, dat[these,], col = 'green', cex = 1, pch = 3)
+    points(Ip~time, dat[these,], col = 'red', cex = 1, pch = 3)
+    points(V~time, dat[these,], col = 'blue', cex = 1, pch = 3)
+    points(P~time, dat[these,], col = 'pink', cex = 1, pch = 3)
+
+
+
 
 
 for(i in 1:length(parmat$NPar)){
