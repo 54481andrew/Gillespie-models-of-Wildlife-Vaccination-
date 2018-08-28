@@ -1,5 +1,6 @@
 
-h <- function(t,parms){with(parms,b0/(1 + ((t%%Tb)/tb)^40))}
+#h <- function(t,parms){with(parms, b0/(1 + ((t%%T)/tb)^40))}
+h <- function(t,parms){with(parms, b0*(t%%T < tb) )}
 
 rhs.fun = function(t,y,parms){
     S <- y[1]

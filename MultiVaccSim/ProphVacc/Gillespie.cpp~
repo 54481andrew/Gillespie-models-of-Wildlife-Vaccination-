@@ -12,27 +12,44 @@ to the Gillespie algorithm.
 #include <stdlib.h>
 #include <time.h>
 #include <fstream> //Used to open files to which data are saved
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 #include <string>
 #include <vector>
+=======
+#include <vector> 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 
 using namespace std;
 
 
 //VARIABLES
 bool EventFlag;
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop,
   nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death,
   V_death, P_death, NVacc, NTrials, NVals, NPar, NPars;
 std::string filepre = "npar_";
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath,
   Picker, Sum, dTime, t, Tmax, tick, ti;
+=======
+int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar;
+char FileNamePar[50] = "Data/ParMat";
+char FileNameDat[50]= "Data/DatMat";
+double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
+const double pi = 3.1415926535;
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 
 ofstream out_data;
 
 //FUNCTION DECLARATIONS
-double Rand () ;
 double BirthRate ( double ) ;
+int Initialize(double **arr, int NCol); //Fills ParMat, returns #Rows
+void OneSim (int, int, int, int, int) ;
+double Rand () ;
+vector<double> Seq(double, double, int);//Returns sequence
+void Show(int i, double **arr, int NRow, int NCol); //Shows ith row of ParMat
 int VaccFun ( int, int ) ;
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 void OneSim (int, int, int, int, int) ;
 vector<double> Seq(double , double , int );
 
@@ -53,10 +70,14 @@ vector<double> Seq(double , double , int );
   T  ~ interval between birth periods
   
   */
+=======
+void WriteParMat(double **arr, int NRow, int NCol); 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 
 //MAIN
 int main()
 {
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
   //Set simulation parameters
   Tmax = (double) 5*365; //Maximum simulation time
   dTime = 0.001; //Time increment
@@ -103,7 +124,7 @@ int main()
       for(int ntrial = 0; ntrial < NTrials; ntrial++)
 	{	  
 	  //Set initial conditions  
-	  t = 0.0;
+	  t = 0;
 	  S = (int) 1000 ; 
 	  Iv = (int) 0;
 	  Ip = (int) 100;
@@ -117,10 +138,75 @@ int main()
 	}//End loop through NTrials
       out_data.close();
     }//End loop through NPars     
+=======
+
+  srand ( time(NULL) );
+
+      //Simulation parameters
+      Tmax = (double) 10*365; dTime = 0.001; NTrials = 5;
+      int NCol = 10; //# columns (parameters)
+      //Assign pointer to 2D array
+      double **ParMat=new double*[NCol];
+      //Fill 2D array with values
+      int NRow = Initialize(ParMat, NCol);
+      WriteParMat(ParMat, NRow, NCol); //Write ParMat
+      
+      for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
+	{
+	  //Extract parameters
+	  b0 = ParMat[1][NPar]; //b0
+	  d = ParMat[2][NPar]; //d
+	  Bp = ParMat[3][NPar]; //Bp
+	  Nv = ParMat[4][NPar]; //Nv
+	  tv = ParMat[5][NPar]; //tv
+	  gamv = ParMat[6][NPar]; //gamv
+	  gamp = ParMat[7][NPar]; //gamp
+	  tb = ParMat[8][NPar]; //tb
+	  T = ParMat[9][NPar]; //T
+
+	  //Write data (1st row)
+	  sprintf(FileNameDat, "Data/NPar_%d", NPar);
+	  out_data.open(FileNameDat);
+	  out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Write data
+	  
+	  for(int ntrial = 0; ntrial < NTrials; ntrial++)
+	    {
+	      
+	      //Set initial conditions  
+	      t = 0;
+	      S = (int) 1000 ; 
+	      Iv = (int) 0;
+	      Ip = (int) 100;
+	      P = (int) 0;
+	      V = (int) 0;
+	      
+	      OneSim(S, Iv, Ip, V, P);
+	      
+	      cout << "Sim Trial: " << ntrial << endl;
+	      
+	    }//End loop through NTrials
+	  out_data.close();
+	  
+	  cout << "*****************************" << endl;	  
+	  cout << "Finished Parameter Set " << NPar+1 << " / " << NRow << endl;
+	  cout << "*****************************" << endl;
+	  
+	}//End Loop through NPars
+      //Remove ParMat
+      for (int j=0; j<NCol; j++)
+	delete [] ParMat[j];
+      delete [] ParMat;
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 }//End Main
 
+      
+      
+//////////////////////////////////////
+///////// DEFINE FUNCTIONS ///////////
+//////////////////////////////////////
 
 
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 //////////////////////////////////////
 ///////// DEFINE FUNCTIONS ///////////
 //////////////////////////////////////
@@ -138,6 +224,16 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
   
   ti = 0; // Works with tick
   
+=======
+void OneSim (int S, int Iv, int Ip, int V, int P)
+{
+
+  Npop = S + Iv + Ip + V + P;
+    
+  tick = 1; //This program writes data after each time interval tick
+  ti = 0;   // Works with tick
+
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
   nbirths = 0;
   ndeaths = 0;
   
@@ -314,7 +410,22 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
 	Npop_next = Npop;
 	nrecp += 1;
       }
-        
+    
+    //Write old values
+    if( t >= ti )
+      {
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
+  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; //Write current values    
+  //cout << "Time: " << t << endl; //"; check sum: " << (Sum + gamp*Ip) / Sum_rate << "Check R " << P << endl; 
+=======
+  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
+	ti = ti + tick;
+	nbirths = 0;
+	ndeaths = 0;
+      }
+
+    
     //Update current state and time
     S = S_next;
     Iv = Iv_next;
@@ -325,18 +436,6 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
       
   } // End If (EventFlag)
       
-
-    //Write old values
-    if( t >= ti )
-      {
-  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; //Write current values    
-  //cout << "Time: " << t << endl; //"; check sum: " << (Sum + gamp*Ip) / Sum_rate << "Check R " << P << endl; 
-	ti = ti + tick;
-	nbirths = 0;
-	ndeaths = 0;
-	//ninf = 0;
-	//nrec = 0;
-      }
       
     t += dTime;
 
@@ -346,6 +445,7 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
 
 
 
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 //Birth function
  double BirthRate( double time ) {
    //Local function declaration
@@ -357,6 +457,9 @@ void OneSim (int S, int Iv, int Ip, int P, int V)
  }
 
 //Random number function
+=======
+//Function returning a random number between 0 and 1
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 double Rand (){
   double unif;
   unif = 0;
@@ -367,6 +470,7 @@ double Rand (){
   return unif;
 }  
 
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 //Sequence function
 vector<double> Seq(double minval, double maxval, int lengthval) {
   vector<double> vec(lengthval);
@@ -377,6 +481,17 @@ vector<double> Seq(double minval, double maxval, int lengthval) {
     }
   return vec;
 }
+=======
+//Birth function
+ double BirthRate( double time ) {
+   //Local function declaration
+   double result;
+   double modtime;
+   modtime = fmod(time, T ) ;
+   result = b0*(modtime < tb) ;
+   return result;
+ }
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
 
 //Vaccination function
 int VaccFun( int S, int Npop) {
@@ -388,12 +503,88 @@ int VaccFun( int S, int Npop) {
     {
       temp = 0;
     }else{
-    temp  = (double) NVacc*S/(Npop) ;
+    temp  = (double) Nv*S/(Npop) ;
   }
   numvacc = round( temp );
   result = min( numvacc , S ) ;
   return result;
 }
 
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp~
 
 
+=======
+//************************************
+//function to Initialize values of 2D array
+int Initialize(double **arr, int NCol)
+{
+  //Choose variable values to fill array with
+  vector<double> tvVals;
+  vector<double> BpVals;
+  tvVals = Seq(1, 364, 25);
+  BpVals = Seq(0.000005,0.00001, 1);
+  int NRow = (int)tvVals.size()* (int)BpVals.size();
+
+  //Allocate memory for the array
+  for(int j=0; j<NCol; j++)
+    {
+      arr[j]=new double[NRow];
+    }
+  //Fixed parameters
+  int i;
+
+  for(int i1=0; i1<tvVals.size(); i1++)
+    {
+      for(int i2=0; i2<BpVals.size(); i2++)
+	{
+	  i = i1*BpVals.size() + i2;
+	  arr[0][i] = i; //NPar
+	  arr[1][i] = 100.0;   //b0
+	  arr[2][i] = 0.004; //d
+	  arr[3][i] = BpVals[i2]; //Bp
+	  arr[4][i] = 5000.0; //Nv
+	  arr[5][i] = tvVals[i1]; //tv
+	  arr[6][i] = 0.007; //gamv
+	  arr[7][i] = 0.007; //gamp
+	  arr[8][i] = 300.0; //tb
+	  arr[9][i] = 365.0; //T
+	}
+    }
+  return i+1; //Return total NUMBER of rows (hence +1)
+}
+
+//************************************
+//function to write values of 2D array
+void WriteParMat(double **arr, int NRow, int NCol)
+{
+  out_data.open(FileNamePar);
+  out_data << "NPar b0 d Bp Nv tv gamv gamp tb T\n"; //Write header
+  int i,j;
+  for(i=0; i<NRow;i++)
+    {
+      for(j=0; j<NCol; j++)
+	{
+	  out_data << arr[j][i] << " "; //Write data
+	}
+      out_data << endl;
+    }
+  out_data.close();
+}
+
+
+//************************************
+//function that returns a sequence from minval to maxval, and of length lengthval
+vector<double> Seq(double minval, double maxval, int lengthval) {
+  vector<double> vec(lengthval);
+  if(lengthval==1)
+    {
+      vec[0] = minval;
+    }else{
+  for(int seqindex = 0; seqindex < lengthval; seqindex++)
+    {
+      vec[seqindex] = minval + (double) seqindex/(lengthval-1)*(maxval-minval);
+    }
+  }
+  return vec;
+}
+>>>>>>> origin/AddParMatInit:MultiVaccSim/ProphVacc/Gillespie.cpp~
