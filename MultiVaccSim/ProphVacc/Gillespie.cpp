@@ -46,7 +46,7 @@ int main()
   srand ( time(NULL) );
 
       //Simulation parameters
-      TMax = (double) 10*365; dTime = 0.001; NTrials = 5;
+      TMax = (double) 10*365; dTime = 0.001; NTrials = 25;
       int NCol = 12; //# columns (parameters)
       //Assign pointer to 2D array
       double **ParMat=new double*[NCol];
@@ -396,24 +396,26 @@ int Initialize(double **arr, int NCol)
 {
   //Choose variable values to fill array with
   vector<double> tvVals;
+  vector<double> TPathInvVals;
   vector<double> BpVals;
-  tvVals = Seq(1, 364, 1);
-  BpVals = Seq(0.000005,0.00001, 1);
-  int NRow = (int)tvVals.size()* (int)BpVals.size();
-
+  tvVals = Seq(1, 364, 5);
+  TPathInvVals = Seq(5*365 + 1, 6*365, 5);
+  double bpvals[] = {0.00001, 0.00005, 0.00001};
+  BpVals.assign(bpvals, bpvals + 3);
+  int NRow = tvVals.size()*BpVals.size()*TPathInvVals.size();
+  cout << "NROW" << NRow << endl ;
   //Allocate memory for the array
   for(int j=0; j<NCol; j++)
     {
       arr[j]=new double[NRow];
     }
   //Fixed parameters
-  int i;
-
+  int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
-    {
-      for(int i2=0; i2<BpVals.size(); i2++)
+    for(int i2=0; i2<BpVals.size(); i2++)
+      for(int i3=0; i3<TPathInvVals.size(); i3++)
 	{
-	  i = i1*BpVals.size() + i2;
+	  i++;
 	  arr[0][i] = i; //NPar
 	  arr[1][i] = 100.0;   //b0
 	  arr[2][i] = 0.004; //d
@@ -425,9 +427,8 @@ int Initialize(double **arr, int NCol)
 	  arr[8][i] = 300.0; //tb
 	  arr[9][i] = 365.0; //T
 	  arr[10][i] = 5; //PInit
-	  arr[11][i] = 5*365; //TPathInv
+	  arr[11][i] = TPathInvVals[i3]; //TPathInv
 	}
-    }
   return i+1; //Return total NUMBER of rows (hence +1)
 }
 
