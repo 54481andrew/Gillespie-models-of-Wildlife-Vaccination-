@@ -323,6 +323,8 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
     t += dTime;
   }//End While
 
+  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+  
   //Update state vector
   State[0] = S;
   State[1] = Iv;
