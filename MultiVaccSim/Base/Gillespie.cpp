@@ -4,6 +4,7 @@ Build a simple c++ script that will
 simulate a stochastic SIR epidemiological
 model. The simulation procedes according
 to the Gillespie algorithm.  
+
 */
 
 #include <iostream> // input/output cout, cin
@@ -11,17 +12,32 @@ to the Gillespie algorithm.
 #include <stdlib.h>
 #include <time.h>
 #include <fstream> //Used to open files to which data are saved
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+#include <string>
+#include <vector>
+=======
 #include <vector> 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
 
 using namespace std;
 
+
 //VARIABLES
 bool EventFlag;
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop,
+  nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death,
+  V_death, P_death, NVacc, NTrials, NVals, NPar, NPars;
+std::string filepre = "npar_";
+double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath,
+  Picker, Sum, dTime, t, Tmax, tick, ti;
+=======
 int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar;
 char FileNamePar[50] = "Data/ParMat";
 char FileNameDat[50]= "Data/DatMat";
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, Tmax, tick, ti;
 const double pi = 3.1415926535;
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
 
 ofstream out_data;
 
@@ -29,15 +45,99 @@ ofstream out_data;
 double BirthRate ( double ) ;
 int Initialize(double **arr, int NCol); //Fills ParMat, returns #Rows
 void OneSim (int, int, int, int, int) ;
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+vector<double> Seq(double , double , int );
+
+
+
+  //************//
+  // PARAMETERS //
+  //************//
+  /*
+  b0 ~ birth rate during birth period
+  d  ~ death rate
+
+  
+  Nv ~ number of vaccines used
+  tv ~ time of vaccination
+
+  tb ~ duration of birth period
+  T  ~ interval between birth periods
+  
+  */
+=======
 double Rand () ;
 vector<double> Seq(double, double, int);//Returns sequence
 void Show(int i, double **arr, int NRow, int NCol); //Shows ith row of ParMat
 int VaccFun ( int, int ) ;
 void WriteParMat(double **arr, int NRow, int NCol); 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
 
 //MAIN
 int main()
 {
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+  //Set simulation parameters
+  Tmax = (double) 5*365; //Maximum simulation time
+  dTime = 0.001; //Time increment
+  NTrials = 25; //Perform the Gillespie simulation NTrials times for each parameter set
+  NVals = 10; //Number of parameter values to loop through
+  tick = 7;   //Write data after each (simulation) time interval tick
+  
+  //Choose parameters that are VARIED. 
+  vector<double> TvVals (NVals);
+  TvVals = Seq(1, 364, NVals);
+  
+  NPars = TvVals.size();            
+  srand ( time(NULL) );
+  
+  //Convert parameter set to char, save text file
+  for(NPar = 0; NPar < NPars ; NPar++)
+    {
+      //Choose fixed parameters: Set biological parameters
+      b0 = 400;
+      tb = 90;
+      T  = 365;
+      d = 0.004;
+      
+      //VACCINATION
+      NVacc = 5000;
+      gamv = 0.07;
+      tv = TvVals[NPar];
+      
+      //PATHOGEN
+      Bp = 0.0000005;
+      gamp = 0.005;
+      R0p = 0;
+
+      char FileName[50];
+      sprintf(FileName, "Data/NPar_%d",NPar);
+
+      out_data.open(FileName);
+      out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Place these names in the open file
+
+      cout << "************" << endl;
+      cout << "Parameter: " << NPar << endl;
+      cout << "************" << endl;
+      
+      for(int ntrial = 0; ntrial < NTrials; ntrial++)
+	{	  
+	  //Set initial conditions  
+	  t = 0.0;
+	  S = (int) 1000 ; 
+	  Iv = (int) 0;
+	  Ip = (int) 100;
+	  P = (int) 0;
+	  V = (int) 0;
+	  
+	  OneSim(S, Iv, Ip, P, V);
+	  
+	  cout << "Sim Trial: " << ntrial << endl;
+	  
+	}//End loop through NTrials
+      out_data.close();
+    }//End loop through NPars     
+=======
 
   srand ( time(NULL) );
 
@@ -95,6 +195,7 @@ int main()
       for (int j=0; j<NCol; j++)
 	delete [] ParMat[j];
       delete [] ParMat;
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
 }//End Main
 
       
@@ -106,15 +207,28 @@ int main()
 
 void OneSim (int S, int Iv, int Ip, int V, int P)
 {
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+  
+  Npop = S + Iv + Ip + P + V;
+  
+  //Define Structure for storing data
+  
+  //  cout << "d: " << d << "\n";
+  //cout << "S0: " << S << "; Iv0: " << Iv << "; Ip0: " << Ip << "; V0: " << V << "; P0: " << P << "\n" << "\n"; 
+  
+  ti = 0; // Works with tick
+  
+=======
 
   Npop = S + Iv + Ip + V + P;
     
   tick = 1; //This program writes data after each time interval tick
   ti = 0;   // Works with tick
 
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
   nbirths = 0;
   ndeaths = 0;
-
+  
   ninfv = 0;
   ninfp = 0;
   
@@ -288,17 +402,7 @@ void OneSim (int S, int Iv, int Ip, int V, int P)
 	Npop_next = Npop;
 	nrecp += 1;
       }
-    
-    //Write old values
-    if( t >= ti )
-      {
-  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
-	ti = ti + tick;
-	nbirths = 0;
-	ndeaths = 0;
-      }
-
-    
+        
     //Update current state and time
     S = S_next;
     Iv = Iv_next;
@@ -309,6 +413,15 @@ void OneSim (int S, int Iv, int Ip, int V, int P)
       
   } // End If (EventFlag)
       
+
+    //Write old values
+    if( t >= ti )
+      {
+  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+	ti = ti + tick;
+	nbirths = 0;
+	ndeaths = 0;
+      }
       
     t += dTime;
 
@@ -317,17 +430,6 @@ void OneSim (int S, int Iv, int Ip, int V, int P)
 }//End OneSim
 
 
-
-//Function returning a random number between 0 and 1
-double Rand (){
-  double unif;
-  unif = 0;
-  while (unif == 0)
-    {
-      unif = (double) rand() / RAND_MAX ;
-   }
-  return unif;
-}  
 
 //Birth function
  double BirthRate( double time ) {
@@ -338,6 +440,40 @@ double Rand (){
    result = b0*(modtime < tb) ;
    return result;
  }
+
+//Random number function
+double Rand (){
+  double unif;
+  unif = 0;
+  while (unif == 0)
+    {
+      unif = (double) rand() / RAND_MAX ;
+   }
+  return unif;
+}  
+
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+//Sequence function
+vector<double> Seq(double minval, double maxval, int lengthval) {
+  vector<double> vec(lengthval);
+  for(int seqindex = 0; seqindex < lengthval; seqindex++)
+    {
+      vec[seqindex] = minval + (double) seqindex/(lengthval-1)*(maxval-minval);\
+
+    }
+  return vec;
+}
+=======
+//Birth function
+ double BirthRate( double time ) {
+   //Local function declaration
+   double result;
+   double modtime;
+   modtime = fmod(time, T ) ;
+   result = b0*(modtime < tb) ;
+   return result;
+ }
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
 
 //Vaccination function
 int VaccFun( int S, int Npop) {
@@ -356,6 +492,10 @@ int VaccFun( int S, int Npop) {
   return result;
 }
 
+<<<<<<< HEAD:MultiVaccSim/Gillespie.cpp
+
+
+=======
 //************************************
 //function to Initialize values of 2D array
 int Initialize(double **arr, int NCol)
@@ -429,3 +569,4 @@ vector<double> Seq(double minval, double maxval, int lengthval) {
   }
   return vec;
 }
+>>>>>>> origin/AddParMatInit:MultiVaccSim/Base/Gillespie.cpp
