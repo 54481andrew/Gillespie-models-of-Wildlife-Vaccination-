@@ -1,4 +1,4 @@
-
+//
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
