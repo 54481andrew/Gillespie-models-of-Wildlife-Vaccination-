@@ -1,3 +1,4 @@
+
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
@@ -26,7 +27,6 @@ int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, 
 int State[5];
 char FileNamePar[50], FileSuffix[50], FileNameDat[50], DirName[50];
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, TMax, tick, ti, TPathInv;
-const double pi = 3.1415926535;
 ofstream out_data;
 
 //FUNCTION DECLARATIONS
@@ -48,7 +48,7 @@ int main()
   srand ( time(NULL) );
 
       //Simulation parameters
-      TMax = (double) 10*365; dTime = 0.001; NTrials = 25;
+      TMax = (double) 10*365; dTime = 0.001; NTrials = 50;
       int NCol = 12; //# columns (parameters)
       //Assign pointer to 2D array
       double **ParMat=new double*[NCol];
@@ -402,13 +402,17 @@ int Initialize(double **arr, int NCol)
   //Choose variable values to fill array with
   vector<double> tvVals;
   vector<double> TPathInvVals;
-  vector<double> BpVals;
-  tvVals = Seq(1, 364, 5);
-  TPathInvVals = Seq(5*365 + 1, 6*365, 5);
-  double bpvals[] = {0.00001, 0.00005, 0.00001};
+  vector<double> BpVals; double bpvals[] = {0.00001, 0.00005, 0.0001};
+  vector<int> PInitVals; int pinitvals[]={1,5,10};
+
+  tvVals = Seq(1, 365, 13);
+  TPathInvVals = Seq(5*365 + 1, 6*365, 13);
+
   BpVals.assign(bpvals, bpvals + 3);
-  int NRow = tvVals.size()*BpVals.size()*TPathInvVals.size();
-  cout << "NROW" << NRow << endl ;
+  PInitVals.assign(pinitvals, pinitvals + 3);
+
+  int NRow = tvVals.size()*TPathInvVals.size()*BpVals.size()*PInitVals.size();
+
   //Allocate memory for the array
   for(int j=0; j<NCol; j++)
     {
@@ -419,21 +423,22 @@ int Initialize(double **arr, int NCol)
   for(int i1=0; i1<tvVals.size(); i1++)
     for(int i2=0; i2<BpVals.size(); i2++)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
-	{
-	  arr[0][i] = i; //NPar
-	  arr[1][i] = 100.0;   //b0
-	  arr[2][i] = 0.004; //d
-	  arr[3][i] = BpVals[i2]; //Bp
-	  arr[4][i] = 5000.0; //Nv
-	  arr[5][i] = tvVals[i1]; //tv
-	  arr[6][i] = 0.007; //gamv
-	  arr[7][i] = 0.007; //gamp
-	  arr[8][i] = 300.0; //tb
-	  arr[9][i] = 365.0; //T
-	  arr[10][i] = 5; //PInit
-	  arr[11][i] = TPathInvVals[i3]; //TPathInv
-	  i++;
-	}
+	for(int i4=0; i4<PInitVals.size();i4++)
+	  {
+	    arr[0][i] = i; //NPar
+	    arr[1][i] = 100.0;   //b0
+	    arr[2][i] = 0.004; //d
+	    arr[3][i] = BpVals[i2]; //Bp
+	    arr[4][i] = 5000.0; //Nv
+	    arr[5][i] = tvVals[i1]; //tv
+	    arr[6][i] = 0.007; //gamv
+	    arr[7][i] = 0.007; //gamp
+	    arr[8][i] = 90.0; //tb
+	    arr[9][i] = 365.0; //T
+	    arr[10][i] = (double) PInitVals[i4]; //PInit
+	    arr[11][i] = TPathInvVals[i3]; //TPathInv
+	    i++;
+	  }
   return i+1; //Return total NUMBER of rows (hence +1)
 }
 
