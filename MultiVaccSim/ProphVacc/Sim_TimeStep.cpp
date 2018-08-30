@@ -20,7 +20,7 @@ of a zoonotic pathogen.
 using namespace std;
 
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Sim_2"
+char SimName[50] = "Sim_2";
 bool VerboseWriteFlag = false;
 
 //OTHER VARIABLES
@@ -115,16 +115,17 @@ int main()
 	      cout << "Sim Trial: " << ntrial << endl;
 	      
 	    }//End loop through NTrials
-	  out_data.close();
+	  if(VerboseWriteFlag){out_data.close();}
 	  
-	  //Write TExtMat
-	  WriteMat(TExtMat, NPars, NTrials, FileNameTExt); //Write ParMat
-
 	  cout << "*****************************" << endl;	  
 	  cout << "Finished Parameter Set " << NPar+1 << " / " << NPars << endl;
 	  cout << "*****************************" << endl;
 	  
 	}//End Loop through NPars
+
+      //Write TExtMat
+      WriteMat(TExtMat, NPars, NTrials, FileNameTExt); //Write ParMat
+
 
       //Remove ParMat
       for (int j=0; j<NCol; j++)
@@ -181,6 +182,7 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
 
     //Get reaction rate for next time step
     b = BirthRate( t ) ;    
+
     Sum_rate = b + d*Npop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip ;
       
     //Determine whether an event occurs during this time step
@@ -351,6 +353,7 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
 
   if(VerboseWriteFlag){
     out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+    out_data.close();
   }
   
   //Update state vector
@@ -420,11 +423,11 @@ int Initialize(double **pmat, double **textmat, int NCol)
   vector<double> BpVals; double bpvals[] = {0.00001, 0.00005, 0.0001};
   vector<int> PInitVals; int pinitvals[]={1, 5, 10};
 
-  tvVals = Seq(1, 365, 1);
-  TPathInvVals = Seq(5*365 + 1, 6*365, 1);
+  tvVals = Seq(1, 365, 13);
+  TPathInvVals = Seq(5*365 + 1, 6*365, 13);
 
-  BpVals.assign(bpvals, bpvals + 1);
-  PInitVals.assign(pinitvals, pinitvals + 1);
+  BpVals.assign(bpvals, bpvals + 13);
+  PInitVals.assign(pinitvals, pinitvals + 13);
 
   int NPars = tvVals.size()*TPathInvVals.size()*BpVals.size()*PInitVals.size();
 
