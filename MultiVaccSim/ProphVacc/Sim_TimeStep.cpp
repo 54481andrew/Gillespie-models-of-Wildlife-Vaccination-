@@ -20,24 +20,27 @@ of a zoonotic pathogen.
 using namespace std;
 
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Sim_1";
+char SimName[50] = "Sim_2"
+bool VerboseWriteFlag = false;
+
 //OTHER VARIABLES
 bool EventFlag;
 int S_next, S, Iv_next, Iv, Ip_next, Ip, V_next, V, P_next, P, Npop_next, Npop, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, Nv, NTrials, NPar, PInit;
 int State[5];
-char FileNamePar[50], FileSuffix[50], FileNameDat[50], DirName[50];
+char FileNamePar[50], FileSuffix[50], FileNameDat[50], FileNameTExt[50], DirName[50];
 double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Sum_rate, UniSeed, RandDeath, Picker, Sum, dTime, t, TMax, tick, ti, TPathInv;
 ofstream out_data;
 
+
 //FUNCTION DECLARATIONS
 double BirthRate ( double ) ;
-int Initialize(double **arr, int NCol); //Fills ParMat, returns #Rows
+int Initialize(double **pmat, double **textmat, int NCol); //Fills ParMat, initializes TExtMat, returns #Rows
 void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad);
 double Rand () ;
 vector<double> Seq(double, double, int); //Returns sequence
-void Show(int i, double **arr, int NRow, int NCol); //Shows ith row of ParMat
+void Show(int i, double **arr, int NPars, int NCol); //Shows ith row of ParMat
 int VaccFun ( int, int );
-void WriteParMat(double **arr, int NRow, int NCol); 
+void WriteMat(double **arr, int NPars, int NCol, char* filename); 
 
 //MAIN
 int main()
@@ -45,29 +48,38 @@ int main()
   strcpy(FileNamePar, "Data/ParMat_");
   strcat(FileNamePar, SimName);  
 
+  strcpy(FileNameTExt, "Data/TExtMat_");
+  strcat(FileNameTExt, SimName);  
+
   srand ( time(NULL) );
 
   //Simulation parameters: OneSim writes data at time-intervals tick
   TMax=(double)10*365; dTime=0.001; NTrials=50; tick=(double)1; 
 
       int NCol = 12; //# columns (parameters)
-      //Assign pointer to 2D array
+      //Assign pointer to 2D array ParMat
       double **ParMat=new double*[NCol];
-      //Fill 2D array with values
-      int NRow = Initialize(ParMat, NCol);
-      WriteParMat(ParMat, NRow, NCol); //Write ParMat
+      //Assign pointer to 2D array TExtMat
+      double **TExtMat = new double*[NTrials];
+
+	int NPars = Initialize(ParMat, TExtMat, NCol);
+
+      WriteMat(ParMat, NPars, NCol, FileNamePar); //Write ParMat
       
-      for(int NPar = 0; NPar < NRow; NPar++) //Loop through parameters
+      for(int NPar = 0; NPar < NPars; NPar++) //Loop through parameters
 	{
 
-	  strcpy(DirName, "Data/");
-	  strcat(DirName, SimName);  
-	  mkdir(DirName, ACCESSPERMS);
-	  strcat(DirName, "/");
-	  
-	  strcpy(FileNameDat, DirName);
-	  sprintf(FileSuffix, "Npar_%d",NPar);
-	  strcat(FileNameDat, FileSuffix);
+	  if(VerboseWriteFlag){
+	    strcpy(DirName, "Data/");
+	    strcat(DirName, SimName);  
+	    mkdir(DirName, ACCESSPERMS);
+	    strcat(DirName, "/");	  
+	    strcpy(FileNameDat, DirName);
+	    sprintf(FileSuffix, "NPar_%d",NPar);
+	    strcat(FileNameDat, FileSuffix);
+	    out_data.open(FileNameDat);
+	    out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Write data
+	  }
 
 	  //Extract parameters
 	  //Parmat[0] corresponds to NPar;
@@ -83,10 +95,6 @@ int main()
 	  PInit = (int) ParMat[10][NPar]; // Initial level of pathogen upon invasion
 	  TPathInv = ParMat[11][NPar]; // Time of pathogen invasion
 
-	  //Write data (1st row)
-	  out_data.open(FileNameDat);
-	  out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n"; //Write data
-	  
 	  for(int ntrial = 0; ntrial < NTrials; ntrial++)
 	    {
 	      State[0] = 1000; //S
@@ -97,17 +105,23 @@ int main()
 	      //Simulate to quasi steady state (rewrites State)
 	      OneSim(0, TPathInv, State, false);
 	      
-	      //Simulate invasion until TMax years
+	      //Simulate invasion until TMax years, or pathogen extinction
 	      State[2] = PInit;
 	      OneSim(TPathInv, TMax, State, true);
-
+	      
+	      //Store final value of t in TExtMat
+	      TExtMat[ntrial][NPar] = t;
+ 
 	      cout << "Sim Trial: " << ntrial << endl;
 	      
 	    }//End loop through NTrials
 	  out_data.close();
 	  
+	  //Write TExtMat
+	  WriteMat(TExtMat, NPars, NTrials, FileNameTExt); //Write ParMat
+
 	  cout << "*****************************" << endl;	  
-	  cout << "Finished Parameter Set " << NPar+1 << " / " << NRow << endl;
+	  cout << "Finished Parameter Set " << NPar+1 << " / " << NPars << endl;
 	  cout << "*****************************" << endl;
 	  
 	}//End Loop through NPars
@@ -136,7 +150,7 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
   Npop = S + Iv + Ip + V + P;
 
   ti = StartTime;
-  double t = StartTime;
+  t = StartTime;
 
   //Track births, deaths, recoveries, etc for error checking
   nbirths = 0;
@@ -324,7 +338,7 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
   } // End If (EventFlag)
     
     //Write old values
-    if( t >= ti )
+    if( t >= ti && VerboseWriteFlag)
       {
   out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	ti += tick;
@@ -335,7 +349,9 @@ void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = fal
     t += dTime;
   }//End While
 
-  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+  if(VerboseWriteFlag){
+    out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << Npop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+  }
   
   //Update state vector
   State[0] = S;
@@ -396,27 +412,34 @@ int VaccFun( int S, int Npop) {
 
 //************************************
 //function to Initialize values of 2D array
-int Initialize(double **arr, int NCol)
+int Initialize(double **pmat, double **textmat, int NCol)
 {
   //Choose variable values to fill array with
   vector<double> tvVals;
   vector<double> TPathInvVals;
   vector<double> BpVals; double bpvals[] = {0.00001, 0.00005, 0.0001};
-  vector<int> PInitVals; int pinitvals[]={1,5,10};
+  vector<int> PInitVals; int pinitvals[]={1, 5, 10};
 
-  tvVals = Seq(1, 365, 13);
-  TPathInvVals = Seq(5*365 + 1, 6*365, 13);
+  tvVals = Seq(1, 365, 1);
+  TPathInvVals = Seq(5*365 + 1, 6*365, 1);
 
-  BpVals.assign(bpvals, bpvals + 3);
-  PInitVals.assign(pinitvals, pinitvals + 3);
+  BpVals.assign(bpvals, bpvals + 1);
+  PInitVals.assign(pinitvals, pinitvals + 1);
 
-  int NRow = tvVals.size()*TPathInvVals.size()*BpVals.size()*PInitVals.size();
+  int NPars = tvVals.size()*TPathInvVals.size()*BpVals.size()*PInitVals.size();
 
-  //Allocate memory for the array
+  //Allocate memory for the array ParMat
   for(int j=0; j<NCol; j++)
     {
-      arr[j]=new double[NRow];
+      pmat[j]=new double[NPars];
     }
+
+  //Allocate memory for array TExtMat
+  for(int j=0; j<NTrials; j++)
+    {
+      textmat[j]=new double[NPars];
+    }
+  
   //Fixed parameters
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
@@ -424,31 +447,31 @@ int Initialize(double **arr, int NCol)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
 	for(int i4=0; i4<PInitVals.size();i4++)
 	  {
-	    arr[0][i] = i; //NPar
-	    arr[1][i] = 100.0;   //b0
-	    arr[2][i] = 0.004; //d
-	    arr[3][i] = BpVals[i2]; //Bp
-	    arr[4][i] = 5000.0; //Nv
-	    arr[5][i] = tvVals[i1]; //tv
-	    arr[6][i] = 0.007; //gamv
-	    arr[7][i] = 0.007; //gamp
-	    arr[8][i] = 90.0; //tb
-	    arr[9][i] = 365.0; //T
-	    arr[10][i] = (double) PInitVals[i4]; //PInit
-	    arr[11][i] = TPathInvVals[i3]; //TPathInv
+	    pmat[0][i] = i; //NPar
+	    pmat[1][i] = 100.0;   //b0
+	    pmat[2][i] = 0.004; //d
+	    pmat[3][i] = BpVals[i2]; //Bp
+	    pmat[4][i] = 5000.0; //Nv
+	    pmat[5][i] = tvVals[i1]; //tv
+	    pmat[6][i] = 0.007; //gamv
+	    pmat[7][i] = 0.007; //gamp
+	    pmat[8][i] = 90.0; //tb
+	    pmat[9][i] = 365.0; //T
+	    pmat[10][i] = (double) PInitVals[i4]; //PInit
+	    pmat[11][i] = TPathInvVals[i3]; //TPathInv
 	    i++;
 	  }
-  return i+1; //Return total NUMBER of rows (hence +1)
+  return i; //Return total number of rows
 }
 
 //************************************
 //function to write values of 2D array
-void WriteParMat(double **arr, int NRow, int NCol)
+void WriteMat(double **arr, int NPars, int NCol, char*filename)
 {
-  out_data.open(FileNamePar);
-  out_data << "NPar b0 d Bp Nv tv gamv gamp tb T PInit TPathInv\n"; //Write header
+  out_data.open(filename);
+  //out_data << "NPar b0 d Bp Nv tv gamv gamp tb T PInit TPathInv\n"; //Write header
   int i,j;
-  for(i=0; i<NRow;i++)
+  for(i=0; i<NPars;i++)
     {
       for(j=0; j<NCol; j++)
 	{
