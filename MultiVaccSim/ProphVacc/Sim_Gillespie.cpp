@@ -21,29 +21,31 @@ of a zoonotic pathogen.
 
 //********
 //CONSTANT MACRO
-#define TPathLEN 13
-#define tvLEN 13 
-#define NTrials 50
-#define NParSets = tvLEN*TPathLEN*3*3; //Number of parameter sets simulated
+#define TPathLEN 1
+#define tvLEN 1
+#define NTrials 1
+#define NParSets = tvLEN*TPathLEN*1*1; //Number of parameter sets simulated
 #define NumPars 12
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Sim_2";
-bool VerboseWriteFlag = false;
+char SimName[50] = "Sim_Test";
+bool VerboseWriteFlag = true;
 
 vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
 vector<double> TPathInvVals;
 
-double bpvals[] = {0.00001, 0.00005, 0.0001};
+double bpvals[] = {0.00005};
 vector<double> BpVals; 
 
-int pinitvals[]={1, 5, 10};
+int pinitvals[]={10};
 vector<int> PInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+
+int SInit = 10000;
 
 //********
 //ARRAYS
@@ -53,8 +55,7 @@ double TExtMat [NParSets][NTrials];
 //********
 //CRITICAL VARIABLES
 
-int S, Iv, Ip, V, P, NPop, NPar;
-int State[5];
+int S, Iv, Ip, V, P, NPop, Par;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
 char DirName[50] = "Data/";
@@ -66,13 +67,15 @@ ofstream out_data;
 int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
 
 //FUNCTION DECLARATIONS
-double BirthRate ( double ) ;
+void ApplyEvent();
+void GetTime();
 void Initialize(); //Fills ParMat, initializes TExtMat, returns #Rows
 void OneSim (double StartTime, double EndTime, bool StopOnErad);
 double Rand () ;
 vector<double> Seq(double, double, int); //Returns sequence
-int VaccFun();
+void VaccFun();
 void WriteMat(double **arr, int NRow, int NCol, char* filename); 
+
 
 //MAIN
 int main()
@@ -85,56 +88,58 @@ int main()
 
   WriteMat(ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
   
-  for(int NPar = 0; NPar < NParSets; NPar++) //Loop through parameters
+  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
 	strcat(DirName, SimName);  
 	mkdir(DirName, ACCESSPERMS);
 	strcat(DirName, "/");	  
 	strcpy(FileNameDat, DirName);
-	sprintf(FileSuffix, "NPar_%d",NPar);
+	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n";
       }
       
       //Extract parameters
-      //Parmat[0] corresponds to NPar;
-      b0 = ParMat[1][NPar]; //b0
-      d = ParMat[2][NPar]; //d
-      Bp = ParMat[3][NPar]; //Bp
-      Nv = ParMat[4][NPar]; //Nv
-      tv = ParMat[5][NPar]; //tv
-      gamv = ParMat[6][NPar]; //gamv
-      gamp = ParMat[7][NPar]; //gamp
-      tb = ParMat[8][NPar]; //tb
-      T = ParMat[9][NPar]; //T
-      PInit = (int) ParMat[10][NPar]; // Initial level of pathogen upon invasion
-      TPathInv = ParMat[11][NPar]; // Time of pathogen invasion
+      //Parmat[0] corresponds to Par;
+      b0 = ParMat[1][Par]; //b0
+      d = ParMat[2][Par]; //d
+      Bp = ParMat[3][Par]; //Bp
+      Nv = ParMat[4][Par]; //Nv
+      tv = ParMat[5][Par]; //tv
+      gamv = ParMat[6][Par]; //gamv
+      gamp = ParMat[7][Par]; //gamp
+      tb = ParMat[8][Par]; //tb
+      T = ParMat[9][Par]; //T
+      PInit = (int) ParMat[10][Par]; // Initial level of pathogen upon invasion
+      TPathInv = ParMat[11][Par]; // Time of pathogen invasion
       
       for(int ntrial = 0; ntrial < NTrials; ntrial++)
 	{
-	  State[0] = 1000; //S
-	  State[1] = 0; //Iv
-	  State[2] = 0; //Ip
-	  State[3] = 0; //V
-	  State[4] = 0; //P
+	  S = SInit; //S
+	  Iv = 0; //Iv
+	  Ip = 0; //Ip
+	  V = 0; //V
+	  P = 0; //P
+	  NPop = S + Iv + Ip + V + P;
+
 	  //Simulate to quasi steady state (rewrites State)
 	  OneSim(0, TPathInv, false);
 	      
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  State[2] = PInit;
+	  P = PInit;
 	  OneSim(TPathInv, TMax, true);
 	  
 	  //Store final value of t in TExtMat
-	  TExtMat[ntrial][NPar] = t;
+	  TExtMat[ntrial][Par] = t;
 	      
 	  std::cout << "Sim Trial: " << ntrial << endl;
 	  
 	}//End loop through NTrials
 	  
       std::cout << "*****************************" << endl;	  
-      std::cout << "Finished Parameter Set " << NPar+1 << " / " << NParSets << endl;
+      std::cout << "Finished Parameter Set " << Par+1 << " / " << NParSets << endl;
       std::cout << "*****************************" << endl;
       
     }//End Loop through NParSets
@@ -159,64 +164,36 @@ int main()
 //////////////////////////////////////
 
 
-void OneSim (double StartTime, double EndTime, int* State, bool StopOnErad = false)
+void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 {
   //Set initial conditions: No Pathogen, no vaccination
-  S = State[0];
-  Iv =State[1];
-  Ip =State[2];
-  V = State[3];
-  P = State[4];
-  NPop = S + Iv + Ip + V + P;
-
   ti = StartTime;
   t = StartTime;
-
+  b = (double) b0*(t%%T < tb));
   //Track births, deaths, recoveries, etc for error checking
   nbirths = 0; ndeaths = 0; ninfv = 0; ninfp = 0; nrecv = 0; 
   nrecv = 0; S_death = 0; Iv_death = 0; Ip_death = 0;  
   V_death = 0; P_death = 0;
   
   while(t < EndTime && (Ip > 0 || !StopOnErad)) {
-    b = BirthRate( t ) ;    
     Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip ;
-    Picker = Rand();
     Event_Rate_Prod = Event_Rate*Rand();
+    
+    dTime = GetTime(); //Get time to next event
+
+    //Check if dTime brings t past tv, tb, or T
+    if()//HERE
+    
+    ApplyEvent();
 
     //Vaccination
     if ( (fmod(t,T) <= tv) && (fmod(t + dTime,T) > tv ) )
       {
-	S_next = S - VaccFun();
-	Iv_next = Iv + VaccFun();
-	S = S_next;
-	Iv = Iv_next;
-	EventFlag = false;
       }
-    if(Event_Rate_Prod <= b) //Birth
-      { S++; NPop++; nbirths++; } 
-    else if(Event_Rate_Prod <= b + d*NPop) //Death
-      {
-	RandDeath = Rand()*NPop;
-	if( RandDeath < S ) //S dies
-	  {S--; S_death++;}
-	else if(RandDeath < S + Iv) //Iv dies
-	  {Iv--; Iv_death++;}
-	else if(RandDeath < S + Iv + Ip) //Ip dies
-	  {Ip--; Ip_death++;}
-	else if(RandDeath < S + Iv + Ip + V) //V dies
-	  {V--; V_death++;}
-	else{P--; P_death++;}  //P dies	
-	NPop--; ndeaths++;
-      }  
-    else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
-      {S--; Ip++; ninfp++;}
-    else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
-      {Iv--; Ip++; ninfp++;}
-    else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
-      {Iv--;V++;nrecv++;}
-    else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Ip Recovery
-      {Ip--; P++; nrecp++;}
-            
+
+
+
+    
     //Write old values
     if( t >= ti && VerboseWriteFlag)
       {
@@ -251,24 +228,50 @@ double Rand (){
   do
     {
       unif = (double) rand() / RAND_MAX ;
-    } while(unif==0);
+    } while(unif==0.0);
   return unif;
 }  
 
 //************************************
 //Function that returns the time for the next event
-double GetTime (double random){
-  double dtime;
+double GetTime (){
+  double dtime, random;
   // Select random time step (doesn't allow for infite time step)
   do
     {
-      tstep = -log(random) / Event_Rate;
+      random = (double) rand() / RAND_MAX ;
+      dtime = -log(random) / Event_Rate;
     } while (tstep == INFINITY); //End of DO WHILE loop
-  //Add time step to current time
-  tcurrent += tstep;
-  return(tcurrent);
+  return(dtime);
+}
 
-
+//************************************
+//Function that updates state variables
+void ApplyEvent() {
+  if(Event_Rate_Prod <= b) //Birth
+    { S++; NPop++; nbirths++; } 
+  else if(Event_Rate_Prod <= b + d*NPop) //Death
+    {
+      RandDeath = Rand()*NPop;
+      if( RandDeath < S ) //S dies
+	{S--; S_death++;}
+      else if(RandDeath < S + Iv) //Iv dies
+	{Iv--; Iv_death++;}
+      else if(RandDeath < S + Iv + Ip) //Ip dies
+	{Ip--; Ip_death++;}
+      else if(RandDeath < S + Iv + Ip + V) //V dies
+	{V--; V_death++;}
+      else{P--; P_death++;}  //P dies	
+      NPop--; ndeaths++;
+    }  
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
+    {S--; Ip++; ninfp++;}
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
+    {Iv--; Ip++; ninfp++;}
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
+    {Iv--;V++;nrecv++;}
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Ip Recovery
+    {Ip--; P++; nrecp++;}
 }
 
 //************************************
@@ -285,16 +288,10 @@ double GetTime (double random){
 
 //************************************
 //Vaccination function
-int VaccFun(){
-  int result;
-  int numvacc;
-  int temp;
-
-  if(NPop==0 || S==0)
-    {temp = 0;}
-  else{temp  = round((double) Nv*S/(NPop));}
-  result = min(temp , S ) ;
-  return result;
+void VaccFun(){
+  int temp  = min(round( (double) Nv*S/(max(NPop,1))), S);
+  S -= temp;
+  Iv += temp;
 }
 
 //************************************
@@ -313,7 +310,7 @@ void Initialize()
       for(int i3=0; i3<TPathInvVals.size(); i3++)
 	for(int i4=0; i4<PInitVals.size();i4++)
 	  {
-	    ParMat[0][i] = i; //NPar
+	    ParMat[0][i] = i; //Par
 	    ParMat[1][i] = 100.0;   //b0
 	    ParMat[2][i] = 0.004; //d
 	    ParMat[3][i] = BpVals[i2]; //Bp
@@ -335,7 +332,6 @@ void Initialize()
 void WriteMat(double **arr, int NRow, int NCol, char*filename)
 {
   out_data.open(filename);
-  //out_data << "NPar b0 d Bp Nv tv gamv gamp tb T PInit TPathInv\n"; //Write header
   int i,j;
   for(i=0; i<NRow;i++)
     {
