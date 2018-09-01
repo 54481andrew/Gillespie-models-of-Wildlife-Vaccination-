@@ -18,30 +18,36 @@ of a zoonotic pathogen.
 #include <vector> 
 #include <string.h>
 #include <sys/stat.h> // mkdir
+#include <cmath> //fmod
+
+//---------------------------------------------------------START HEADER FILE
 
 //********
-//CONSTANT MACRO
-#define TPathLEN 1
-#define tvLEN 1
-#define NTrials 1
-#define NParSets = tvLEN*TPathLEN*1*1; //Number of parameter sets simulated
-#define NumPars 12
+//CONSTANTS
+
+const int NTrials = 1;
+const int TPathLEN = 1;
+const int PInitLEN = 1;
+const int tvLEN = 1;
+const int BpLEN = 1;
+const int NParSets = 1;
+const int NumPars = 12;
 
 //********
 //USER-ASSIGNED VARIABLES
 char SimName[50] = "Sim_Test";
 bool VerboseWriteFlag = true;
 
-vector<double> tvVals;
+std::vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
-vector<double> TPathInvVals;
+std::vector<double> TPathInvVals;
 
 double bpvals[] = {0.00005};
-vector<double> BpVals; 
+std::vector<double> BpVals; 
 
 int pinitvals[]={10};
-vector<int> PInitVals; 
+std::vector<int> PInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -54,31 +60,32 @@ double TExtMat [NParSets][NTrials];
 
 //********
 //CRITICAL VARIABLES
-int S, Iv, Ip, V, P, NPop, Par;
+int S, Iv, Ip, V, P, NPop, Par, PInit;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
 char DirName[50] = "Data/";
-char FileSuffix[50], FileNameDat[50], FileNameTExt[50], DirName[50];
-double b0, tb, T, tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
-ofstream out_data;
+char FileSuffix[50], FileNameDat[50];
+double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
+std::ofstream out_data;
 
 //OTHER VARIABLES
 int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
-int whichmin, ntrial;
-double whichindex;
-
+int ntrial, whichindex;
+double whichmin, unif, tmodT;
+double Nudge = 0.000001;
 
 //FUNCTION DECLARATIONS
-void CheckEventConflict(double val1, double val2, double val3);
+void CheckEventConflict();
 void ApplyEvent();
 void GetTime();
 void Initialize(); //Fills ParMat, initializes TExtMat, returns #Rows
 void OneSim (double StartTime, double EndTime, bool StopOnErad);
 double Rand () ;
-vector<double> Seq(double, double, int); //Returns sequence
+std::vector<double> Seq(double, double, int); //Returns sequence
 void VaccFun();
-void WriteMat(double **arr, int NRow, int NCol, char* filename); 
+void WriteMat(double *arr, int NRow, int NCol, char* filename); 
 
+//---------------------------------------------------------END HEADER FILE
 
 //MAIN
 int main()
@@ -89,7 +96,7 @@ int main()
   strcat(FileNameTExt, SimName);  
   Initialize(); //Fill in the parameter matrix
 
-  WriteMat(ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
+  WriteMat((double *) ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
   
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
@@ -128,7 +135,7 @@ int main()
 	  NPop = S + Iv + Ip + V + P;
 
 	  //Simulate to quasi steady state (rewrites State)
-	  OneSim(0, TPathInv, false);
+	  OneSim(0.0, TPathInv, false);
 	      
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  P = PInit;
@@ -137,17 +144,17 @@ int main()
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
 	      
-	  std::cout << "Sim Trial: " << ntrial << endl;
+	  std::cout << "Sim Trial: " << ntrial << std::endl;
 	  
 	}//End loop through NTrials
 	  
-      std::cout << "*****************************" << endl;	  
-      std::cout << "Finished Parameter Set " << Par+1 << " / " << NParSets << endl;
-      std::cout << "*****************************" << endl;
+      std::cout << "*****************************" << std::endl;	  
+      std::cout << "Finished Parameter Set " << Par+1 << " / " << NParSets << std::endl;
+      std::cout << "*****************************" << std::endl;
       
     }//End Loop through NParSets
 
-  WriteMat(TExtMat, NParSets, NTrials, FileNameTExt); //Write TExtMat      
+  WriteMat((double *)TExtMat, NParSets, NTrials, FileNameTExt); //Write TExtMat      
 }//End Main
 
       
@@ -187,41 +194,30 @@ void ApplyEvent() {
 
 //*************************************
 //function that finds the min of 3 doubles, and min's index CHECK
-void CheckEventConflict (double val0, double val1, double val2){
-  //  whichindex and whichmin
-  if(val0 <= val1)
+void CheckEventConflict (){
+  whichmin = T - tmodT;
+  whichindex = 0;
+  if(tmodT < tb && tb-tmodT < whichmin)
     {
-      if(val0 <= val2){
-	whichmin = val0;
-	whichindex = 0;
-      }
-      else{
-	whichmin = val2;
-	whichindex = 2;
-      }      
-    }
-  else if(val1 <= val2)
-    {
-      whichmin = val1;
+      whichmin = tb-tmodT;
       whichindex = 1;
     }
-  else{
-    whichmin = val2;
-    whichindex = 2;
-  } 
+  if(tmodT < tv && tv-tmodT < whichmin)
+    {
+      whichmin = tv-tmodT;
+      whichindex = 2;
+    }
 }
 
 //************************************
 //Function that returns the time for the next event
-double GetTime (){
-  double dtime, random;
+void GetTime (){
   // Select random time step (doesn't allow for infite time step)
   do
     {
-      random = (double) rand() / RAND_MAX ;
-      dtime = -log(random) / Event_Rate;
-    } while (tstep == INFINITY); //End of DO WHILE loop
-  return(dtime);
+      dTime = (double) rand() / RAND_MAX ; //Use var dTime for storage
+      dTime = -log(dTime) / Event_Rate; //Assign next timestep
+    } while (dTime == INFINITY); //Avoid infinite timesteps
 }
 
 //************************************
@@ -238,23 +234,22 @@ void Initialize()
   for(int i1=0; i1<tvVals.size(); i1++)
     for(int i2=0; i2<BpVals.size(); i2++)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
-	for(int i4=0; i4<PInitVals.size();i4++)
+	for(int i4=0; i4<PInitVals.size(); i4++)
 	  {
-	    ParMat[0][i] = i; //Par
-	    ParMat[1][i] = 100.0;   //b0
-	    ParMat[2][i] = 0.004; //d
-	    ParMat[3][i] = BpVals[i2]; //Bp
-	    ParMat[4][i] = 5000.0; //Nv
-	    ParMat[5][i] = tvVals[i1]; //tv
-	    ParMat[6][i] = 0.007; //gamv
-	    ParMat[7][i] = 0.007; //gamp
-	    ParMat[8][i] = 90.0; //tb
-	    ParMat[9][i] = 365.0; //T
-	    ParMat[10][i] = (double) PInitVals[i4]; //PInit
-	    ParMat[11][i] = TPathInvVals[i3]; //TPathInv
+	    ParMat[i][0] = i; //Par
+	    ParMat[i][1] = 100.0;   //b0
+	    ParMat[i][2] = 0.004; //d
+	    ParMat[i][3] = BpVals[i2]; //Bp
+	    ParMat[i][4] = 5000.0; //Nv
+	    ParMat[i][5] = tvVals[i1]; //tv
+	    ParMat[i][6] = 0.007; //gamv
+	    ParMat[i][7] = 0.007; //gamp
+	    ParMat[i][8] = 90.0; //tb
+	    ParMat[i][9] = 365.0; //T
+	    ParMat[i][10] = (double) PInitVals[i4]; //PInit
+	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
 	    i++;
 	  }
-  return i; //Return total number of rows
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
@@ -262,7 +257,9 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
   //Set initial conditions: No Pathogen, no vaccination
   ti = StartTime;
   t = StartTime;
-  b = (double) b0*(t%%T < tb);
+
+  tmodT = std::fmod(t,T);
+  b = (double) b0*(tmodT < tb);
 
   //Track births, deaths, recoveries, etc for error checking
   nbirths = 0; ndeaths = 0; ninfv = 0; ninfp = 0; nrecv = 0; 
@@ -279,25 +276,30 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	  ti += tick;
 	  nbirths = 0; ndeaths = 0;
 	}  
-      Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip ;
+      Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
       
-      dTime = GetTime(); //Get time to next event
-      CheckEventConflict(T-t%%T, max(0,tb-t%%T), max(0,tv-t%%T)); //Check if dTime brings t past tv, tb, or T
-      
-      if(dTime < whichmin) //If no conflicts, proceed with Gillepsie 
+      GetTime(); //Get time to next event
+
+      CheckEventConflict(); //Finds whichmin, the time of the next conflict
+      if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
+	
 	dTime = whichmin;
-	switch(whichindex){
-	case 0 : b = b0; //Start of birthing season
-	case 1 : b = 0; //End of birthing season
-	case 2 : VaccFun(); //Pulse vaccination
-	}
+	switch(whichindex)
+	  {
+	  case 0 : b = b0; break;//Start of birthing season
+	  case 1 : b = 0.0; break;//End of birthing season
+	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
+	  }
+	if(dTime==0.0)
+	  {dTime+=Nudge;}
       }    
       t += dTime;
+      tmodT = std::fmod(t,T);
     }//End While
   
   if(VerboseWriteFlag)
@@ -310,7 +312,6 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 //************************************
 //Function returning a random number between 0 and 1
 double Rand (){
-  double unif = 0.0;
   do
     {
       unif = (double) rand() / RAND_MAX ;
@@ -320,8 +321,8 @@ double Rand (){
 
 //************************************
 //function that returns a sequence from minval to maxval, and of length lengthval
-vector<double> Seq(double minval, double maxval, int lengthval) {
-  vector<double> vec(lengthval);
+std::vector<double> Seq(double minval, double maxval, int lengthval) {
+  std::vector<double> vec(lengthval);
   if(lengthval==1)
     {
       vec[0] = minval;
@@ -337,14 +338,15 @@ vector<double> Seq(double minval, double maxval, int lengthval) {
 //************************************
 //Vaccination function
 void VaccFun(){
-  int temp  = min(round( (double) Nv*S/(max(NPop,1))), S);
+  int temp = (int) round( (double) Nv*S/(std::max(NPop,1)));
+  temp  = std::min( temp,  S);
   S -= temp;
   Iv += temp;
 }
 
 //************************************
 //function to write values of 2D array
-void WriteMat(double **arr, int NRow, int NCol, char*filename)
+void WriteMat(double *arr, int NRow, int NCol, char*filename)
 {
   out_data.open(filename);
   int i,j;
@@ -352,9 +354,10 @@ void WriteMat(double **arr, int NRow, int NCol, char*filename)
     {
       for(j=0; j<NCol; j++)
 	{
-	  out_data << arr[i][j] << " "; 
+	  //	  out_data << arr[i][j] << " "; 
+	  out_data << *((arr+i*NRow) + j) << " "; 
 	}
-      out_data << endl;
+      out_data << std::endl;
     }
   out_data.close();
 }
