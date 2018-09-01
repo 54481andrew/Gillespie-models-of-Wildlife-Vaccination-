@@ -25,28 +25,31 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 25;
-const int TPathLEN = 1;
-const int IpInitLEN = 1;
-const int tvLEN = 4;
-const int BpLEN = 1;
-const int NParSets = 1;
+const int NTrials = 50;
+const int TPathLEN = 26;
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
+const int tvLEN = 26;
+const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
+
+const int NParSets = 6084;
+
+
 const int NumPars = 12;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Sim_Test";
-bool VerboseWriteFlag = true;
+char SimName[50] = "Sim_DeerMice";
 
 std::vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
 std::vector<double> TPathInvVals;
 
-double bpvals[] = {0.00005};
+
 std::vector<double> BpVals; 
 
-int ipinitvals[]={100};
+
 std::vector<int> IpInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
@@ -96,8 +99,8 @@ int main()
   strcat(FileNameTExt, SimName);  
   Initialize(); //Fill in the parameter matrix
 
-  WriteMat((double *) ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
-  
+  WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
+
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
@@ -360,7 +363,7 @@ void WriteMat(double *arr, int NRow, int NCol, char*filename)
       for(j=0; j<NCol; j++)
 	{
 	  //	  out_data << arr[i][j] << " "; 
-	  out_data << *((arr+i*NRow) + j) << " "; 
+	  out_data << *((arr+i*NCol) + j) << " "; 
 	}
       out_data << std::endl;
     }
