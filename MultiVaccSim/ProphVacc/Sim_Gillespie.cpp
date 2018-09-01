@@ -25,10 +25,10 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 1;
+const int NTrials = 25;
 const int TPathLEN = 1;
-const int PInitLEN = 1;
-const int tvLEN = 1;
+const int IpInitLEN = 1;
+const int tvLEN = 4;
 const int BpLEN = 1;
 const int NParSets = 1;
 const int NumPars = 12;
@@ -46,8 +46,8 @@ std::vector<double> TPathInvVals;
 double bpvals[] = {0.00005};
 std::vector<double> BpVals; 
 
-int pinitvals[]={10};
-std::vector<int> PInitVals; 
+int ipinitvals[]={100};
+std::vector<int> IpInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -60,7 +60,7 @@ double TExtMat [NParSets][NTrials];
 
 //********
 //CRITICAL VARIABLES
-int S, Iv, Ip, V, P, NPop, Par, PInit;
+int S, Iv, Ip, V, P, NPop, Par, IpInit;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
 char DirName[50] = "Data/";
@@ -122,7 +122,7 @@ int main()
       gamp = ParMat[Par][7]; //gamp
       tb = ParMat[Par][8]; //tb
       T = ParMat[Par][9]; //T
-      PInit = (int) ParMat[Par][10]; // Initial level of pathogen upon invasion
+      IpInit = (int) ParMat[Par][10]; // Initial level of pathogen upon invasion
       TPathInv = ParMat[Par][11]; // Time of pathogen invasion
       
       for(ntrial = 0; ntrial < NTrials; ntrial++)
@@ -138,8 +138,9 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 	      
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  P = PInit;
+	  Ip = IpInit;
 	  OneSim(TPathInv, TMax, true);
+
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
@@ -147,7 +148,12 @@ int main()
 	  std::cout << "Sim Trial: " << ntrial << std::endl;
 	  
 	}//End loop through NTrials
-	  
+
+      if(VerboseWriteFlag)
+	{
+	  out_data.close();
+	}
+      
       std::cout << "*****************************" << std::endl;	  
       std::cout << "Finished Parameter Set " << Par+1 << " / " << NParSets << std::endl;
       std::cout << "*****************************" << std::endl;
@@ -188,7 +194,7 @@ void ApplyEvent() {
     {Iv--; Ip++; ninfp++;}
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Ip Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {Ip--; P++; nrecp++;}
 }
 
@@ -227,17 +233,17 @@ void Initialize()
   tvVals = Seq(1, 365, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
-  PInitVals.assign(pinitvals, pinitvals + PInitLEN);
+  IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
   
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
     for(int i2=0; i2<BpVals.size(); i2++)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
-	for(int i4=0; i4<PInitVals.size(); i4++)
+	for(int i4=0; i4<IpInitVals.size(); i4++)
 	  {
 	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 100.0;   //b0
+	    ParMat[i][1] = 400.0;   //b0
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = 5000.0; //Nv
@@ -246,7 +252,7 @@ void Initialize()
 	    ParMat[i][7] = 0.007; //gamp
 	    ParMat[i][8] = 90.0; //tb
 	    ParMat[i][9] = 365.0; //T
-	    ParMat[i][10] = (double) PInitVals[i4]; //PInit
+	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
 	    i++;
 	  }
@@ -305,7 +311,6 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
   if(VerboseWriteFlag)
     {
       out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
-      out_data.close();
     }
 }
 
