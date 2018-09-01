@@ -101,7 +101,7 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
-  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
+  for(int Par = 234; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
 	strcat(DirName, SimName);  
@@ -137,13 +137,15 @@ int main()
 	  P = 0; //P
 	  NPop = S + Iv + Ip + V + P;
 
+	  //	  std::cout << "initok\n";
+	  
 	  //Simulate to quasi steady state (rewrites State)
 	  OneSim(0.0, TPathInv, false);
-	      
+	  //	      	  std::cout << "sim1ok\n";
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  Ip = IpInit;
 	  OneSim(TPathInv, TMax, true);
-
+	  //	      	  std::cout << "sim2ok\n";
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
@@ -289,22 +291,25 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
       Event_Rate_Prod = Event_Rate*Rand();
       
       GetTime(); //Get time to next event
-
+      
       CheckEventConflict(); //Finds whichmin, the time of the next conflict
+      //      std::cout<<dTime << "  " << t << "\n";
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
+	  //	  std::cout<<dTime << "  " << t << "  Gil" << "\n";
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
 	dTime = whichmin;
+	//	std::cout<<dTime << "  " << t << "  Con" << "  " << whichindex <<  "\n";
 	switch(whichindex)
 	  {
 	  case 0 : b = b0; break;//Start of birthing season
 	  case 1 : b = 0.0; break;//End of birthing season
 	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
 	  }
-	if(dTime==0.0)
+	if(dTime<Nudge)
 	  {dTime+=Nudge;}
       }    
       t += dTime;
