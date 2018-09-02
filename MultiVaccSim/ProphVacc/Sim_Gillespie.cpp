@@ -101,7 +101,7 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
-  for(int Par = 234; Par < NParSets; Par++) //Loop through parameters
+  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
 	strcat(DirName, SimName);  
