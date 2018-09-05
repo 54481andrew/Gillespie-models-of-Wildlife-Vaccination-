@@ -29,9 +29,10 @@ const int NTrials = 50;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
+const int BpLEN = 3; double bpvals[] = {0.001,0.005,0.01};
+const int NvLEN = 3; double nvvals[] = {450, 675, 900};
 
-const int NParSets = 6084;
+const int NParSets = 18252;
 
 
 const int NumPars = 12;
@@ -39,7 +40,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Sim_DeerMice";
+char SimName[50] = "DeerMice_Ha";
 
 std::vector<double> tvVals;
 
@@ -48,7 +49,7 @@ std::vector<double> TPathInvVals;
 
 
 std::vector<double> BpVals; 
-
+std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
@@ -137,15 +138,12 @@ int main()
 	  P = 0; //P
 	  NPop = S + Iv + Ip + V + P;
 
-	  //	  std::cout << "initok\n";
-	  
 	  //Simulate to quasi steady state (rewrites State)
 	  OneSim(0.0, TPathInv, false);
-	  //	      	  std::cout << "sim1ok\n";
+
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  Ip = IpInit;
 	  OneSim(TPathInv, TMax, true);
-	  //	      	  std::cout << "sim2ok\n";
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
@@ -239,19 +237,20 @@ void Initialize()
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  
+  NvVals.assign(nvvals, nvvals + NvLEN);
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
     for(int i2=0; i2<BpVals.size(); i2++)
       for(int i3=0; i3<TPathInvVals.size(); i3++)
 	for(int i4=0; i4<IpInitVals.size(); i4++)
+	  for(int i5=0; i5<NvVals.size(); i5++)
 	  {
 	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 400.0;   //b0
+	    ParMat[i][1] = 4.0;   //b0
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
-	    ParMat[i][4] = 5000.0; //Nv
+	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
 	    ParMat[i][6] = 0.007; //gamv
 	    ParMat[i][7] = 0.007; //gamp
@@ -293,16 +292,16 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
       GetTime(); //Get time to next event
       
       CheckEventConflict(); //Finds whichmin, the time of the next conflict
-      //      std::cout<<dTime << "  " << t << "\n";
+
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-	  //	  std::cout<<dTime << "  " << t << "  Gil" << "\n";
+
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
 	dTime = whichmin;
-	//	std::cout<<dTime << "  " << t << "  Con" << "  " << whichindex <<  "\n";
+
 	switch(whichindex)
 	  {
 	  case 0 : b = b0; break;//Start of birthing season
