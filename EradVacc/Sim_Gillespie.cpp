@@ -251,7 +251,7 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	    {
 	      ParMat[i][0] = i; //Par
-	      ParMat[i][1] = 4.0;   //b0
+	      ParMat[i][1] = 5.0;   //b0
 	      ParMat[i][2] = 0.004; //d
 	      ParMat[i][3] = BpVals[i2]; //Bp
 	      ParMat[i][4] = NvVals[i5]; //Nv

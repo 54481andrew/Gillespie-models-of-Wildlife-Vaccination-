@@ -63,7 +63,7 @@ nbreaks = length(breaks)
 initcols = c('purple', 'orange')#brewer.pal(, "Blues")
 cols = colorRampPalette(initcols)(nbreaks-1)
 
-
+if(zmin < zmax){
             FileName = paste('PExt_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='')      
             png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', res = 400)
             par(mai = c(1,1,0.25,0.25))
@@ -89,6 +89,11 @@ cols = colorRampPalette(initcols)(nbreaks-1)
 
 i=i+1
 print(paste("Figure", i, "complete",sep = " " ))
+}else{
+print(paste("Figure", i, "fail",sep = " " ))
+}
+
+
     }}}#End Loop through fixed vals
 
 
