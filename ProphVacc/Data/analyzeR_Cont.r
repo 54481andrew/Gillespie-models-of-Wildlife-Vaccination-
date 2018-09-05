@@ -1,5 +1,7 @@
 SimName = "Sim_DeerMice"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
+parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
+parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 NPars = nrow(parmat)
 NTrials = 50
