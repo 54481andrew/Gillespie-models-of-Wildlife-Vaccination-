@@ -25,15 +25,15 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 50;
+const int NTrials = 200;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 26;
 const int BpLEN = 3; double bpvals[] = {0.001,0.005,0.01};
-const int NvLEN = 26;
+const int NvLEN = 52;
 
 
-const int NParSets = 2028;
+const int NParSets = 4056;
 
 
 const int NumPars = 12;
@@ -41,7 +41,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha";
+char SimName[50] = "DeerMice_Ha_1";
 
 std::vector<double> tvVals;
 
@@ -240,7 +240,7 @@ void Initialize()
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1,1001,NvLEN);
+  NvVals = Seq(1,5001,NvLEN);
   
   //Fill in ParMat
   int i = 0;

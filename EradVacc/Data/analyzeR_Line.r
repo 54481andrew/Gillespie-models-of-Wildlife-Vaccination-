@@ -1,8 +1,8 @@
-SimName = "DeerMice_Ha"
+SimName = "DeerMice_Ha_1"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 NPars = nrow(parmat)
-NTrials = 50
+NTrials = 200
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
@@ -15,13 +15,12 @@ TExtMat = read.table(TExtMatFile, header = FALSE)
 ##after TFoc years. X-axis, XValName.  
 XValName = 'tv'
 XVals = unique(parmat[,XValName])
-ZValName = ''
+ZValName = '' #Parameter varied across line plots
 ZVals = unique(parmat[,ZValName])
 FixValName1 = 'Bp'
 FixVals1 = c(0.005)
-FixValName2 = 'TPathInv'
+FixValName2 = 'Nv'
 FixVals2 = unique(parmat[,FixValName2])
-FixVals2 = c(29.2)
 
 FigFold = paste(SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}

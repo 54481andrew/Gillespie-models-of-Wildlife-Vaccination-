@@ -1,10 +1,10 @@
-SimName = "DeerMice_Ha"
+SimName = "DeerMice_Ha_1"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
-NTrials = 50
+NTrials = 200
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
@@ -14,17 +14,17 @@ TExtMat = read.table(TExtMatFile, header = FALSE)
 ######## EXTINCTION PLOT C ##########
 #####################################
 ##Contour plot. Y-axis: TPathInv
-##X-axis: tv; Z-axis: F_Ext?
+##X-axis: tv;
 XValName = 'tv'
 XVals = unique(parmat[,XValName])
-YValName = 'TPathInv'
+YValName = 'Nv'
 YVals = unique(parmat[,YValName])
 FixValName1 = 'Bp'
 FixVals1 = c(0.001,0.005,0.01)
-FixValName2 = 'IpInit'
-FixVals2 = c(1,5,10)
-FixValName3 = 'Nv'
-FixVals3 = c(450, 675, 900)
+FixValName2 = 'b0'
+FixVals2 = c(5)
+FixValName3 = 'd'
+FixVals3 = 0.004
 
 FigFold = paste(SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
@@ -75,7 +75,7 @@ if(zmin < zmax){
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = axislabs)
-	    axis(side = 2, labels = axislabs, at = seq(5*365,6*365, by = 60))
+	    axis(side = 2, labels = T, at = seq(0,2000,by = 100))
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)

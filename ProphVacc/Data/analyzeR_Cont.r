@@ -1,10 +1,10 @@
-SimName = "DeerMice_Ha"
+SimName = "DeerMice_Ha_1"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
-NTrials = 50
+NTrials = 200
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
@@ -58,7 +58,7 @@ for(i1 in 1:nFixVals1){
 	}
 zmin = floor(10*min(PExtMat))/10
 zmax = 1
-breaks = seq(zmin,zmax,by = 0.05)
+breaks = seq(zmin,zmax,by = 0.01)
 nbreaks = length(breaks)
 initcols = c('purple', 'orange')#brewer.pal(, "Blues")
 cols = colorRampPalette(initcols)(nbreaks-1)
@@ -86,14 +86,11 @@ if(zmin < zmax){
 	    	    ylim = range(breaks), xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
 	    axis(side = 4, las = 1)
             dev.off()
-
-i=i+1
 print(paste("Figure", i, "complete",sep = " " ))
 }else{
 print(paste("Figure", i, "fail",sep = " " ))
 }
-
-
+i=i+1
     }}}#End Loop through fixed vals
 
 
