@@ -25,9 +25,9 @@ vaccinate <- function(t,y,parms){
     Ip <- y[3]
     V <- y[4]
     P <- y[5]
-    
-    nvacc <- round(min(S, NVacc*S/(S + Iv + Ip + V + P)))
     with(parms,{
+
+    nvacc <- round(min(S, Nv*S/(S + Iv + Ip + V + P)))
 	S   <- S - nvacc
 	Iv  <- Iv + nvacc
 	y <- c(S, Iv, Ip, V, P)

@@ -25,29 +25,28 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 200;
+const int NTrials = 10;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.001,0.005,0.01};
-const int NvLEN = 52;
+const int tvLEN = 1;
+const int BpLEN = 1; double bpvals[] = {0.00005};
+const int NvLEN = 1;
 
 
-const int NParSets = 4056;
+const int NParSets = 1;
 
 
 const int NumPars = 12;
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_1";
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
 std::vector<double> TPathInvVals;
-
 
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
@@ -240,7 +239,7 @@ void Initialize()
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1,5001,NvLEN);
+  NvVals = Seq(1000,5001,NvLEN);
   
   //Fill in ParMat
   int i = 0;
@@ -251,7 +250,7 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	    {
 	      ParMat[i][0] = i; //Par
-	      ParMat[i][1] = 5.0;   //b0
+	      ParMat[i][1] = 4.0;   //b0
 	      ParMat[i][2] = 0.004; //d
 	      ParMat[i][3] = BpVals[i2]; //Bp
 	      ParMat[i][4] = NvVals[i5]; //Nv
