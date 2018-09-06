@@ -28,12 +28,12 @@ of a zoonotic pathogen.
 const int NTrials = 200;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.001,0.005,0.01};
+const int tvLEN = 52;
+const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
 const int NvLEN = 52;
 
 
-const int NParSets = 4056;
+const int NParSets = 8112;
 
 
 const int NumPars = 12;
@@ -251,7 +251,7 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	    {
 	      ParMat[i][0] = i; //Par
-	      ParMat[i][1] = 5.0;   //b0
+	      ParMat[i][1] = 4.0;   //b0
 	      ParMat[i][2] = 0.004; //d
 	      ParMat[i][3] = BpVals[i2]; //Bp
 	      ParMat[i][4] = NvVals[i5]; //Nv
