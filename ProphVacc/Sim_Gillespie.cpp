@@ -29,7 +29,7 @@ const int NTrials = 200;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.001,0.005,0.01};
+const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
 const int NvLEN = 3; double nvvals[] = {450, 675, 900};
 
 const int NParSets = 18252;
