@@ -1,4 +1,4 @@
-SimName = "DeerMice_Ha_1"
+SimName = "Freq_DeerMice_Ha_1"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -21,7 +21,7 @@ XVals = unique(parmat[,XValName])
 YValName = 'Nv'
 YVals = unique(parmat[,YValName])
 FixValName1 = 'Bp'
-FixVals1 = c(0.00001,0.00005,0.0001)
+FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'b0'
 FixVals2 = c(4.0)
 FixValName3 = 'd'
