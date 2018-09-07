@@ -24,33 +24,27 @@ of a zoonotic pathogen.
 
 //********
 //CONSTANTS
-
 const int NTrials = 10;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 1;
-const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {200};
-
+const int BpLEN = 1; double bpvals[] = {0.0125};
+const int NvLEN = 1;
 const int NParSets = 1;
 
-
-const int NumPars = 12;
+const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_T1";
+char SimName[50] = "Freq_DeerMice_Ha_T1";
 
 std::vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
 std::vector<double> TPathInvVals;
-
-
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
-
 std::vector<int> IpInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
@@ -73,8 +67,7 @@ double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod,
 std::ofstream out_data;
 
 //OTHER VARIABLES
-int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
-int ntrial, whichindex;
+int ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
 double whichmin, unif, tmodT;
 double Nudge = 0.000001;
 
@@ -120,7 +113,7 @@ int main()
       b0 = ParMat[Par][1]; //b0
       d = ParMat[Par][2]; //d
       Bp = ParMat[Par][3]; //Bp
-      Nv = ParMat[Par][4]; //Nv
+      //----Nv is set within for(ntrial = 0...) loop----
       tv = ParMat[Par][5]; //tv
       gamv = ParMat[Par][6]; //gamv
       gamp = ParMat[Par][7]; //gamp
@@ -128,21 +121,23 @@ int main()
       T = ParMat[Par][9]; //T
       IpInit = (int) ParMat[Par][10]; // Initial level of pathogen upon invasion
       TPathInv = ParMat[Par][11]; // Time of pathogen invasion
-      
+ 
       for(ntrial = 0; ntrial < NTrials; ntrial++)
 	{
 	  S = SInit; //S
 	  Iv = 0; //Iv
-	  Ip = 0; //Ip
+	  Ip = IpInit; //Ip introduced immediately
 	  V = 0; //V
 	  P = 0; //P
 	  NPop = S + Iv + Ip + V + P;
 
+	  
 	  //Simulate to quasi steady state (rewrites State)
+	  Nv = 0; //No vaccination at first
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  Ip = IpInit;
+	  Nv = ParMat[Par][4]; //Nv 
 	  OneSim(TPathInv, TMax, true);
 	  
 	  //Store final value of t in TExtMat
@@ -191,13 +186,13 @@ void ApplyEvent() {
       else{P--; P_death++;}  //P dies	
       NPop--; ndeaths++;
     }  
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S/NPop)    //Event: Pathogen infection of S
     {S--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop ) //Event: Pathogen infection of V
     {Iv--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv + gamp*Ip) //Event: Ip Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {Ip--; P++; nrecp++;}
 }
 
@@ -236,8 +231,10 @@ void Initialize()
   tvVals = Seq(1, 365, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
+  //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals.assign(nvvals, nvvals + NvLEN);
+  NvVals = Seq(100,1001,NvLEN);
+  
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
@@ -245,21 +242,21 @@ void Initialize()
       for(int i3=0; i3<TPathInvVals.size(); i3++)
 	for(int i4=0; i4<IpInitVals.size(); i4++)
 	  for(int i5=0; i5<NvVals.size(); i5++)
-	  {
-	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 4.0;   //b0
-	    ParMat[i][2] = 0.004; //d
-	    ParMat[i][3] = BpVals[i2]; //Bp
-	    ParMat[i][4] = NvVals[i5]; //Nv
-	    ParMat[i][5] = tvVals[i1]; //tv
-	    ParMat[i][6] = 0.007; //gamv
-	    ParMat[i][7] = 0.007; //gamp
-	    ParMat[i][8] = 90.0; //tb
-	    ParMat[i][9] = 365.0; //T
-	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
-	    i++;
-	  }
+	    {
+	      ParMat[i][0] = i; //Par
+	      ParMat[i][1] = 4.0;   //b0
+	      ParMat[i][2] = 0.004; //d
+	      ParMat[i][3] = BpVals[i2]; //Bp
+	      ParMat[i][4] = NvVals[i5]; //Nv
+	      ParMat[i][5] = tvVals[i1]; //tv
+	      ParMat[i][6] = 0.007; //gamv
+	      ParMat[i][7] = 0.007; //gamp
+	      ParMat[i][8] = 90.0; //tb
+	      ParMat[i][9] = 365.0; //T
+	      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
+	      ParMat[i][11] = TPathInvVals[i3]; //TPathInv
+	      i++;
+	    }
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
@@ -284,24 +281,24 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
-	  nbirths = 0; ndeaths = 0; P_death = 0; nrecp = 0;
+	  nbirths = 0; ndeaths = 0;
 	}  
-      Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
+      Event_Rate = b + d*NPop + (Bp*S*Ip + Bp*Iv*Ip)/NPop + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
       
       GetTime(); //Get time to next event
       
       CheckEventConflict(); //Finds whichmin, the time of the next conflict
-
+      //      std::cout<<dTime << "  " << t << "\n";
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-
+	  //	  std::cout<<dTime << "  " << t << "  Gil" << "\n";
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
 	dTime = whichmin;
-
+	//	std::cout<<dTime << "  " << t << "  Con" << "  " << whichindex <<  "\n";
 	switch(whichindex)
 	  {
 	  case 0 : b = b0; break;//Start of birthing season

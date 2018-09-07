@@ -27,9 +27,9 @@ of a zoonotic pathogen.
 
 const int NTrials = 10;
 const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={100};
+const int IpInitLEN = 3; int ipinitvals[]={10};
 const int tvLEN = 1;
-const int BpLEN = 1; double bpvals[] = {0.00005};
+const int BpLEN = 1; double bpvals[] = {0.025};// {0.00001,0.00005,0.0001};
 const int NvLEN = 1; double nvvals[] = {200};
 
 const int NParSets = 1;
@@ -40,7 +40,7 @@ const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_T1";
+char SimName[50] = "Freq_DeerMice_Ha_T1";
 
 std::vector<double> tvVals;
 
@@ -191,13 +191,13 @@ void ApplyEvent() {
       else{P--; P_death++;}  //P dies	
       NPop--; ndeaths++;
     }  
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S/NPop)    //Event: Pathogen infection of S
     {S--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop) //Event: Pathogen infection of V
     {Iv--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv + gamp*Ip) //Event: Ip Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {Ip--; P++; nrecp++;}
 }
 
@@ -284,9 +284,9 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
-	  nbirths = 0; ndeaths = 0; P_death = 0; nrecp = 0;
+	  nbirths = 0; ndeaths = 0;
 	}  
-      Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
+      Event_Rate = b + d*NPop + (Bp*S*Ip + Bp*Iv*Ip)/NPop + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
       
       GetTime(); //Get time to next event
@@ -295,7 +295,6 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
