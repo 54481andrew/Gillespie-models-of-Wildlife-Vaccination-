@@ -142,7 +142,7 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  Ip = IpInit;
+	  Ip = IpInit; NPop += IpInit;
 	  OneSim(TPathInv, TMax, true);
 	  
 	  //Store final value of t in TExtMat
