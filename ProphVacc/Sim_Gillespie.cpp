@@ -142,7 +142,7 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  Ip = IpInit;
+	  Ip = IpInit; NPop+=IpInit;
 	  OneSim(TPathInv, TMax, true);
 	  
 	  //Store final value of t in TExtMat
@@ -189,6 +189,7 @@ void ApplyEvent() {
       else if(RandDeath < S + Iv + Ip + V) //V dies
 	{V--; V_death++;}
       else{P--; P_death++;}  //P dies	
+      
       NPop--; ndeaths++;
     }  
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
@@ -284,7 +285,7 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
-	  nbirths = 0; ndeaths = 0; P_death = 0; nrecp = 0;
+	  nbirths = 0; ndeaths = 0; S_death = 0; Ip_death = 0; P_death = 0; nrecp = 0;
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
