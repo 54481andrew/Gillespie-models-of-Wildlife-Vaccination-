@@ -148,7 +148,7 @@ int main()
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
 	      
-	  std::cout << "Sim Trial: " << ntrial << std::endl;
+	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
 	  
 	}//End loop through NTrials
 

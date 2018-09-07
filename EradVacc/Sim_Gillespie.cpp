@@ -31,12 +31,9 @@ const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
 const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
 const int NvLEN = 52;
-
-
 const int NParSets = 8112;
 
-
-const int NumPars = 12;
+const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
@@ -47,11 +44,8 @@ std::vector<double> tvVals;
 
 double TPathMIN = 5*365; double TPathMAX = 6*365; 
 std::vector<double> TPathInvVals;
-
-
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
-
 std::vector<int> IpInitVals; 
 
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
@@ -74,8 +68,7 @@ double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod,
 std::ofstream out_data;
 
 //OTHER VARIABLES
-int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
-int ntrial, whichindex;
+int ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
 double whichmin, unif, tmodT;
 double Nudge = 0.000001;
 
@@ -121,6 +114,7 @@ int main()
       b0 = ParMat[Par][1]; //b0
       d = ParMat[Par][2]; //d
       Bp = ParMat[Par][3]; //Bp
+      //----Nv is set within for(ntrial = 0...) loop----
       tv = ParMat[Par][5]; //tv
       gamv = ParMat[Par][6]; //gamv
       gamp = ParMat[Par][7]; //gamp
@@ -128,7 +122,7 @@ int main()
       T = ParMat[Par][9]; //T
       IpInit = (int) ParMat[Par][10]; // Initial level of pathogen upon invasion
       TPathInv = ParMat[Par][11]; // Time of pathogen invasion
-      
+ 
       for(ntrial = 0; ntrial < NTrials; ntrial++)
 	{
 	  S = SInit; //S
@@ -150,7 +144,7 @@ int main()
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
 	      
-	  std::cout << "Sim Trial: " << ntrial << std::endl;
+	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
 	  
 	}//End loop through NTrials
 
@@ -195,7 +189,7 @@ void ApplyEvent() {
     }  
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
     {S--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv ) //Event: Pathogen infection of V
     {Iv--; Ip++; ninfp++;}
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
@@ -240,7 +234,7 @@ void Initialize()
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1,5001,NvLEN);
+  NvVals = Seq(1,1001,NvLEN);
   
   //Fill in ParMat
   int i = 0;
