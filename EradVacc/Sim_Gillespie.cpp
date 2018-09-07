@@ -41,7 +41,7 @@ const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Test";
+char SimName[50] = "Test_Nv1000";
 
 std::vector<double> tvVals;
 
