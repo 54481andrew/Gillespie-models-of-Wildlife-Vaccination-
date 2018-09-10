@@ -1,10 +1,10 @@
-SimName = "Freq_DeerMice_Ha_1"
+SimName = "DeerMice_Ha_2_PBShortLag"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
-NTrials = 200
+NTrials = 1000
 VaccStartTime = 5*365 #Time at which vaccination is started
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
@@ -23,7 +23,7 @@ YVals = unique(parmat[,YValName])
 FixValName1 = 'Bp'
 FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'b0'
-FixVals2 = c(4.0)
+FixVals2 = c(40.0)
 FixValName3 = 'd'
 FixVals3 = 0.004
 

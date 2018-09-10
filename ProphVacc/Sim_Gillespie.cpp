@@ -40,7 +40,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_2";
+char SimName[50] = "DeerMice_Ha_2_PBShortLag";
 
 std::vector<double> tvVals;
 
@@ -247,14 +247,14 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	  {
 	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 4.0;   //b0
+	    ParMat[i][1] = 40.0;   //b0
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
-	    ParMat[i][6] = 0.007; //gamv
+	    ParMat[i][6] = 0.7; //gamv
 	    ParMat[i][7] = 0.007; //gamp
-	    ParMat[i][8] = 90.0; //tb
+	    ParMat[i][8] = 9.0; //tb
 	    ParMat[i][9] = 365.0; //T
 	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
