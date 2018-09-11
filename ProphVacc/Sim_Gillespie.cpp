@@ -29,10 +29,10 @@ const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.00001,0.00005,0.0001};
-const int NvLEN = 3; double nvvals[] = {450, 675, 900};
+const int BpLEN = 1; double bpvals[] = {0.00005};
+const int NvLEN = 1; double nvvals[] = {450};
 
-const int NParSets = 18252;
+const int NParSets = 2028;
 
 
 const int NumPars = 12;
@@ -40,7 +40,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_2_PBShortLag";
+char SimName[50] = "DeerMice_Ha_2_PBShortLag_TMax1Yr";
 
 std::vector<double> tvVals;
 
@@ -53,7 +53,7 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
@@ -61,12 +61,14 @@ int SInit = 10000;
 //ARRAYS
 double ParMat [NParSets][NumPars];
 double TExtMat [NParSets][NTrials];
+double IpMat [NParSets][NTrials];
 
 //********
 //CRITICAL VARIABLES
 int S, Iv, Ip, V, P, NPop, Par, IpInit;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
+char FileNameIpMat[50] = "Data/IpMat_";
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
 double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
@@ -97,7 +99,8 @@ int main()
   srand ( time(NULL) );
 
   strcat(FileNamePar, SimName);  
-  strcat(FileNameTExt, SimName);  
+  strcat(FileNameTExt, SimName);
+  strcat(FileNameIpMat, SimName);
   Initialize(); //Fill in the parameter matrix
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
@@ -143,13 +146,12 @@ int main()
 
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  Ip = IpInit; NPop +=IpInit;
-	  OneSim(TPathInv, TMax, true);
-	  
-	  //Store final value of t in TExtMat
+	  //OneSim(TPathInv, TMax, true);
+	  OneSim(TPathInv,TPathInv+TMax, true);
+	  //Store final value of t in TExtMat,
+	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
-	      
-	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
-	  
+	  IpMat[Par][ntrial] = (double) Ip;    
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -164,6 +166,7 @@ int main()
     }//End Loop through NParSets
 
   WriteMat((double *)TExtMat, NParSets, NTrials, FileNameTExt); //Write TExtMat      
+  WriteMat((double *)IpMat, NParSets, NTrials, FileNameIpMat); //Write IpMat
 }//End Main
 
       
@@ -233,7 +236,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(1, 365, tvLEN);
+  tvVals = Seq(0.1, 364.9, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
@@ -285,6 +288,7 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
 	  nbirths = 0; ndeaths = 0;
+
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
