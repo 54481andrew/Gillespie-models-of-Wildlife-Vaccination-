@@ -25,22 +25,22 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 1000;
-const int TPathLEN = 26;
-const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
-const int tvLEN = 26;
+const int NTrials = 100;
+const int TPathLEN = 1;
+const int IpInitLEN = 1; int ipinitvals[]={5};
+const int tvLEN = 1;
 const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {450};
+const int NvLEN = 1; double nvvals[] = {00};
 
-const int NParSets = 2028;
+const int NParSets = 1;
 
 
 const int NumPars = 12;
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Ha_2_PBShortLag_TMax1Yr";
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
@@ -53,7 +53,11 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
+<<<<<<< HEAD
 double TMax = 365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+=======
+double TMax = 5.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+>>>>>>> c5216f70e991abd2a1dea153153481506d718d0e
 
 int SInit = 10000;
 
@@ -236,7 +240,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals = Seq(300.1, 364.9, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
@@ -250,14 +254,14 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	  {
 	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 40.0;   //b0
+	    ParMat[i][1] = 4.0;   //b0
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
 	    ParMat[i][6] = 0.7; //gamv
 	    ParMat[i][7] = 0.007; //gamp
-	    ParMat[i][8] = 9.0; //tb
+	    ParMat[i][8] = 90.0; //tb
 	    ParMat[i][9] = 365.0; //T
 	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
