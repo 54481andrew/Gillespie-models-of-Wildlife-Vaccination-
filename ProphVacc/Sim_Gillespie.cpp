@@ -25,6 +25,7 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
+<<<<<<< HEAD
 const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
@@ -33,14 +34,28 @@ const int BpLEN = 1; double bpvals[] = {0.00005};
 const int NvLEN = 1; double nvvals[] = {450};
 
 const int NParSets = 2028;
+=======
+const int NTrials = 10;
+const int TPathLEN = 1;
+const int IpInitLEN = 1; int ipinitvals[]={100};
+const int tvLEN = 1;
+const int BpLEN = 1; double bpvals[] = {0.00005};
+const int NvLEN = 1; double nvvals[] = {200};
+
+const int NParSets = 1;
+>>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 
 const int NumPars = 12;
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
+<<<<<<< HEAD
 char SimName[50] = "DeerMice_Ha_2_PBShortLag_TMax1Yr";
+=======
+char SimName[50] = "DeerMice_Ha_T1";
+>>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 std::vector<double> tvVals;
 
@@ -145,6 +160,7 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
+<<<<<<< HEAD
 	  Ip = IpInit; NPop +=IpInit;
 	  //OneSim(TPathInv, TMax, true);
 	  OneSim(TPathInv,TPathInv+TMax, true);
@@ -152,6 +168,16 @@ int main()
 	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
 	  IpMat[Par][ntrial] = (double) Ip;    
+=======
+	  Ip = IpInit; NPop+=IpInit;
+	  OneSim(TPathInv, TMax, true);
+	  
+	  //Store final value of t in TExtMat
+	  TExtMat[Par][ntrial] = t;
+	      
+	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
+	  
+>>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -192,6 +218,7 @@ void ApplyEvent() {
       else if(RandDeath < S + Iv + Ip + V) //V dies
 	{V--; V_death++;}
       else{P--; P_death++;}  //P dies	
+      
       NPop--; ndeaths++;
     }  
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
@@ -287,8 +314,12 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
+<<<<<<< HEAD
 	  nbirths = 0; ndeaths = 0;
 
+=======
+	  nbirths = 0; ndeaths = 0; S_death = 0; Ip_death = 0; P_death = 0; nrecp = 0;
+>>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();

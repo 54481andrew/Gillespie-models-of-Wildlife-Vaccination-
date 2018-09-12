@@ -38,7 +38,11 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
+<<<<<<< HEAD
 char SimName[50] = "DeerMice_Ha_2_PB";
+=======
+char SimName[50] = "DeerMice_Ha_2";
+>>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 std::vector<double> tvVals;
 
