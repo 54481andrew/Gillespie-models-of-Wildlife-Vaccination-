@@ -25,7 +25,6 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-<<<<<<< HEAD
 const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
@@ -42,24 +41,6 @@ const bool VerboseWriteFlag = false;
 //********
 //USER-ASSIGNED VARIABLES
 char SimName[50] = "Freq_DeerMice_Ha_2_PBShortLag_TMax1Yr";
-=======
-const int NTrials = 10;
-const int TPathLEN = 1;
-const int IpInitLEN = 3; int ipinitvals[]={10};
-const int tvLEN = 1;
-const int BpLEN = 1; double bpvals[] = {0.025};// {0.00001,0.00005,0.0001};
-const int NvLEN = 1; double nvvals[] = {200};
-
-const int NParSets = 1;
-
-
-const int NumPars = 12;
-const bool VerboseWriteFlag = true;
-
-//********
-//USER-ASSIGNED VARIABLES
-char SimName[50] = "Freq_DeerMice_Ha_T1";
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 std::vector<double> tvVals;
 
@@ -72,11 +53,7 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-<<<<<<< HEAD
 double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
-=======
-double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 int SInit = 10000;
 
@@ -84,20 +61,14 @@ int SInit = 10000;
 //ARRAYS
 double ParMat [NParSets][NumPars];
 double TExtMat [NParSets][NTrials];
-<<<<<<< HEAD
 double IpMat [NParSets][NTrials];
-=======
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 //********
 //CRITICAL VARIABLES
 int S, Iv, Ip, V, P, NPop, Par, IpInit;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
-<<<<<<< HEAD
 char FileNameIpMat[50] = "Data/IpMat_";
-=======
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
 double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
@@ -128,12 +99,8 @@ int main()
   srand ( time(NULL) );
 
   strcat(FileNamePar, SimName);  
-<<<<<<< HEAD
   strcat(FileNameTExt, SimName);
   strcat(FileNameIpMat, SimName);
-=======
-  strcat(FileNameTExt, SimName);  
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
   Initialize(); //Fill in the parameter matrix
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
@@ -178,7 +145,6 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-<<<<<<< HEAD
 	  Ip = IpInit; NPop += IpInit;
 	  OneSim(TPathInv, TPathInv+TMax, true);
 	  
@@ -186,16 +152,6 @@ int main()
 	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
 	  IpMat[Par][ntrial] = (double) Ip;    	      
-=======
-	  Ip = IpInit; NPop +=IpInit;
-	  OneSim(TPathInv, TMax, true);
-	  
-	  //Store final value of t in TExtMat
-	  TExtMat[Par][ntrial] = t;
-	      
-	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
-	  
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -210,10 +166,7 @@ int main()
     }//End Loop through NParSets
 
   WriteMat((double *)TExtMat, NParSets, NTrials, FileNameTExt); //Write TExtMat      
-<<<<<<< HEAD
   WriteMat((double *)IpMat, NParSets, NTrials, FileNameIpMat); //Write IpMat
-=======
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 }//End Main
 
       
@@ -283,11 +236,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-<<<<<<< HEAD
   tvVals = Seq(0.1, 364.9, tvLEN);
-=======
-  tvVals = Seq(1, 365, tvLEN);
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
@@ -301,24 +250,14 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	  {
 	    ParMat[i][0] = i; //Par
-<<<<<<< HEAD
 	    ParMat[i][1] = 40.0;   //b0
-=======
-	    ParMat[i][1] = 4.0;   //b0
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
-<<<<<<< HEAD
 	    ParMat[i][6] = 0.7; //gamv
 	    ParMat[i][7] = 0.007; //gamp
 	    ParMat[i][8] = 9.0; //tb
-=======
-	    ParMat[i][6] = 0.007; //gamv
-	    ParMat[i][7] = 0.007; //gamp
-	    ParMat[i][8] = 90.0; //tb
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	    ParMat[i][9] = 365.0; //T
 	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
@@ -359,10 +298,7 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-<<<<<<< HEAD
 
-=======
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action

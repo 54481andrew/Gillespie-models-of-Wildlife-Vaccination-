@@ -25,25 +25,14 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-<<<<<<< HEAD
-const int NTrials = 1000;
-const int TPathLEN = 26;
-const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
-const int tvLEN = 26;
-const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {450};
-
-const int NParSets = 2028;
-=======
-const int NTrials = 10;
+const int NTrials = 100;
 const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={100};
+const int IpInitLEN = 1; int ipinitvals[]={5};
 const int tvLEN = 1;
 const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {200};
+const int NvLEN = 1; double nvvals[] = {00};
 
 const int NParSets = 1;
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 
 
 const int NumPars = 12;
@@ -51,11 +40,7 @@ const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-<<<<<<< HEAD
-char SimName[50] = "DeerMice_Ha_2_PBShortLag_TMax1Yr";
-=======
-char SimName[50] = "DeerMice_Ha_T1";
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
@@ -68,7 +53,7 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 5.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
@@ -160,7 +145,6 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-<<<<<<< HEAD
 	  Ip = IpInit; NPop +=IpInit;
 	  //OneSim(TPathInv, TMax, true);
 	  OneSim(TPathInv,TPathInv+TMax, true);
@@ -168,16 +152,6 @@ int main()
 	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
 	  IpMat[Par][ntrial] = (double) Ip;    
-=======
-	  Ip = IpInit; NPop+=IpInit;
-	  OneSim(TPathInv, TMax, true);
-	  
-	  //Store final value of t in TExtMat
-	  TExtMat[Par][ntrial] = t;
-	      
-	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
-	  
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -218,7 +192,6 @@ void ApplyEvent() {
       else if(RandDeath < S + Iv + Ip + V) //V dies
 	{V--; V_death++;}
       else{P--; P_death++;}  //P dies	
-      
       NPop--; ndeaths++;
     }  
   else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
@@ -263,7 +236,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals = Seq(300.1, 364.9, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
@@ -277,14 +250,14 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	  {
 	    ParMat[i][0] = i; //Par
-	    ParMat[i][1] = 40.0;   //b0
+	    ParMat[i][1] = 4.0;   //b0
 	    ParMat[i][2] = 0.004; //d
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
 	    ParMat[i][6] = 0.7; //gamv
 	    ParMat[i][7] = 0.007; //gamp
-	    ParMat[i][8] = 9.0; //tb
+	    ParMat[i][8] = 90.0; //tb
 	    ParMat[i][9] = 365.0; //T
 	    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
@@ -314,12 +287,8 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
 	  ti += tick;
-<<<<<<< HEAD
 	  nbirths = 0; ndeaths = 0;
 
-=======
-	  nbirths = 0; ndeaths = 0; S_death = 0; Ip_death = 0; P_death = 0; nrecp = 0;
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
