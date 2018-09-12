@@ -53,7 +53,7 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
