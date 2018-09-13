@@ -6,7 +6,7 @@ require(deSolve)
 source('Tools/Functions.r', local = TRUE)
 
 times = seq(0,10000)
-y0 = c(10000, 0, 0, 0, 00)
+y0 = c(10000, 0, 0, 0, 0)
 names(y0) = c('S','Iv','Ip','V','P')
 
 maxtimes <- 365*10
@@ -35,16 +35,21 @@ for(i in 1:length(parmat$NPar)){
     y0 = as.numeric(y0)
     names(y0) = c('S','Iv','Ip','V','P')
     vacctimespost <- vacctimes[vacctimes >= tpathinv]
-    out2 <- data.frame(lsoda(y = y0, times = seq(tpathinv, 10*365, by = 1), 
+    out2 <- data.frame(lsoda(y = y0, times = seq(tpathinv, tpathinv + 10*365, by = 1), 
                             func = rhs.fun, parms = parmat[i,],
                             events=list(func = vaccinate, time=vacctimespost),
                             maxsteps = 100000))
     out = rbind(out1, out2[-1,])			
 
+###Calculate anticipated pathogen R0 from out1
+    Sfun  <- approxfun(out1$time, out1$S + out1$Iv)
+    Savg  <- 1/365*integrate(Sfun, lower = tpathinv-365, tpathinv)$value
+    R0p   <- with(parmat[i,], Bp*Savg/(d + gamp))
+    
     #Big Picture
     pdf(file = paste(filename, "_big.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(0,365*10), ylim = c(0,35000), type = 'l', lwd = 1)
+    plot(S~time, out, xlim = c(0,tpathinv + 365*10), ylim = c(0,800), type = 'l', lwd = 1)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 1)
     lines(Ip~time, out, col = 'red', lty = 1, lwd = 1)
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
@@ -70,18 +75,18 @@ for(i in 1:length(parmat$NPar)){
     #Small Picture
     pdf(file = paste(filename, "_small.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(0,10*365), ylim = c(0,1000), type = 'l', lwd = 4)
+    plot(S~time, out, xlim = c(0,tpathinv + 10*365), ylim = c(0,800), type = 'l', lwd = 4)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 4)
     lines(Ip~time, out, col = 'red', lty = 1, lwd = 4)
     lines(V~time, out, col = 'blue', lty = 1, lwd = 4)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 4)
     
     these <- seq(1,nrow(dat), by = 100)
-    points(S~time, dat[these,], col = 'black', cex = 1, pch = 3)
-    points(Iv~time, dat[these,], col = 'green', cex = 1, pch = 3)
-    points(Ip~time, dat[these,], col = 'red', cex = 1, pch = 3)
-    points(V~time, dat[these,], col = 'blue', cex = 1, pch = 3)
-    points(P~time, dat[these,], col = 'pink', cex = 1, pch = 3)
+    points(S~time, dat[these,], col = 'black', cex = 0.2, pch = 1)
+    points(Iv~time, dat[these,], col = 'green', cex = 0.2, pch = 1)
+    points(Ip~time, dat[these,], col = 'red', cex = 0.2, pch = 1)
+    points(V~time, dat[these,], col = 'blue', cex = 0.2, pch = 1)
+    points(P~time, dat[these,], col = 'pink', cex = 0.2, pch = 1)
 
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)
@@ -95,20 +100,20 @@ for(i in 1:length(parmat$NPar)){
     #Tiny Picture
     pdf(file = paste(filename, "_tiny.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(tpathinv - 30,3500), ylim = c(0,20), type = 'l', lwd = 4)
+    plot(S~time, out, xlim = c(tpathinv - 30,tpathinv + 10*365), ylim = c(0,100), type = 'l', lwd = 4)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 4)
 
     lines(V~time, out, col = 'blue', lty = 1, lwd = 4)
     #lines(P~time, out, col = 'pink', lty = 1, lwd = 4)
     
     these <- seq(1,nrow(dat), by = 1)
-    #points(S~time, dat[these,], col = 'black', cex = 1, pch = 1)
-    #points(Iv~time, dat[these,], col = 'green', cex = 1, pch = 1)
-    points(Ip~time, dat[these,], col = 'red', cex = 1, pch = 1)
-    #points(V~time, dat[these,], col = 'blue', cex = 1, pch = 1)
-    #points(P~time, dat[these,], col = 'pink', cex = 1, pch = 3)
+    #points(S~time, dat[these,], col = 'black', cex = 0.2, pch = 1)
+    #points(Iv~time, dat[these,], col = 'green', cex = 0.2, pch = 1)
+    points(Ip~time, dat[these,], col = 'red', cex = 0.2, pch = 1)
+    #points(V~time, dat[these,], col = 'blue', cex = 0.2, pch = 1)
+    #points(P~time, dat[these,], col = 'pink', cex = 0.2, pch = 1)
 
-    lines(Ip~time, out, col = 'red', lty = 1, lwd = 4)
+    lines(Ip~time, out, col = 'black', lty = 1, lwd = 4)
     
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)

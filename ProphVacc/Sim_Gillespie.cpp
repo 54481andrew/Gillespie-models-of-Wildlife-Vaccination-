@@ -27,7 +27,7 @@ of a zoonotic pathogen.
 
 const int NTrials = 100;
 const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={5};
+const int IpInitLEN = 1; int ipinitvals[]={50};
 const int tvLEN = 1;
 const int BpLEN = 1; double bpvals[] = {0.00005};
 const int NvLEN = 1; double nvvals[] = {00};
@@ -44,7 +44,7 @@ char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
-double TPathMIN = 5*365; double TPathMAX = 6*365; 
+double TPathMIN = 10*365; double TPathMAX = 11*365; 
 std::vector<double> TPathInvVals;
 
 
@@ -53,7 +53,7 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-double TMax = 5.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
