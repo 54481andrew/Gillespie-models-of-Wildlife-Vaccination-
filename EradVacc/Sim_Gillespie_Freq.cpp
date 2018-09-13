@@ -24,13 +24,13 @@ of a zoonotic pathogen.
 
 //********
 //CONSTANTS
-<<<<<<< HEAD
+//********
 
 const int NTrials = 1000;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
-const int BpLEN = 3; double bpvals[] = {0.0025,0.0125,0.0250};
+const int BpLEN = 3; double bpvals[] = {0.0083,0.0125,0.0187};
 const int NvLEN = 52;
 const int NParSets = 8112;
 
@@ -39,23 +39,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Freq_DeerMice_Ha_2_PBShortLag";
-=======
-const int NTrials = 10;
-const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 1;
-const int BpLEN = 1; double bpvals[] = {0.0125};
-const int NvLEN = 1;
-const int NParSets = 1;
-
-const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = true;
-
-//********
-//USER-ASSIGNED VARIABLES
-char SimName[50] = "Freq_DeerMice_Ha_T1";
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
+char SimName[50] = "Freq_DeerMice_Base";
 
 std::vector<double> tvVals;
 
@@ -65,7 +49,7 @@ std::vector<double> BpVals;
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
 
-double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
@@ -251,11 +235,7 @@ void Initialize()
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-<<<<<<< HEAD
-  NvVals = Seq(1,1001,NvLEN);
-=======
-  NvVals = Seq(100,1001,NvLEN);
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
+  NvVals = Seq(1,500,NvLEN);
   
   //Fill in ParMat
   int i = 0;
@@ -266,24 +246,14 @@ void Initialize()
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	    {
 	      ParMat[i][0] = i; //Par
-<<<<<<< HEAD
 	      ParMat[i][1] = 40.0;   //b0
-=======
-	      ParMat[i][1] = 4.0;   //b0
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	      ParMat[i][2] = 0.004; //d
 	      ParMat[i][3] = BpVals[i2]; //Bp
 	      ParMat[i][4] = NvVals[i5]; //Nv
 	      ParMat[i][5] = tvVals[i1]; //tv
-<<<<<<< HEAD
-	      ParMat[i][6] = 0.7; //gamv
-	      ParMat[i][7] = 0.007; //gamp
-	      ParMat[i][8] = 9.0; //tb
-=======
 	      ParMat[i][6] = 0.007; //gamv
 	      ParMat[i][7] = 0.007; //gamp
 	      ParMat[i][8] = 90.0; //tb
->>>>>>> 750937880367ea851d123313f873c4281956a0b8
 	      ParMat[i][9] = 365.0; //T
 	      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	      ParMat[i][11] = TPathInvVals[i3]; //TPathInv

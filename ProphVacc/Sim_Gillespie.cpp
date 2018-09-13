@@ -25,26 +25,25 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-const int NTrials = 100;
-const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={5};
-const int tvLEN = 1;
-const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {00};
+const int NTrials = 1000;
+const int TPathLEN = 26;
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
+const int tvLEN = 26;
+const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
+const int NvLEN = 3; double nvvals[] = {180,360,450};
 
-const int NParSets = 1;
-
+const int NParSets = 12168;
 
 const int NumPars = 12;
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Test";
+char SimName[50] = "DeerMice_Base";
 
 std::vector<double> tvVals;
 
-double TPathMIN = 5*365; double TPathMAX = 6*365; 
+double TPathMIN = 8*365; double TPathMAX = 9*365; 
 std::vector<double> TPathInvVals;
 
 
@@ -53,11 +52,8 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
-<<<<<<< HEAD
-double TMax = 365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
-=======
-double TMax = 5.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
->>>>>>> c5216f70e991abd2a1dea153153481506d718d0e
+
+double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 10000;
 
@@ -259,7 +255,7 @@ void Initialize()
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
-	    ParMat[i][6] = 0.7; //gamv
+	    ParMat[i][6] = 0.07; //gamv
 	    ParMat[i][7] = 0.007; //gamp
 	    ParMat[i][8] = 90.0; //tb
 	    ParMat[i][9] = 365.0; //T
