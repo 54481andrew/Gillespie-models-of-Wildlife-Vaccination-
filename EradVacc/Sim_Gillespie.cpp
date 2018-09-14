@@ -68,7 +68,7 @@ double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod,
 std::ofstream out_data;
 
 //OTHER VARIABLES
-int svacc, npopvacc, temp, totvacc, ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
+int svacc, npopvacc, temp, totvacc, totbirthon, totbirthoff, ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
 double whichmin, unif, tmodT;
 double Nudge = 0.0000001;
 
@@ -268,6 +268,8 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
   svacc = 0;
   npopvacc = 0;
   totvacc = 0;
+  totbirthon = 0;
+  totbirthoff = 0;
   //Set initial conditions: No Pathogen, no vaccination
   ti = StartTime;
   t = StartTime;
@@ -288,12 +290,13 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
 	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << "\n"; 
 	  ti += tick;
-	  if(totvacc > 1)
+	  if(totvacc > 1 || totbirthon >1 || totbirthoff >1)
 	    {
 	      std::cout << "Too many vaccinations!\n";
 	      abort();
 	    }
-	  nbirths = 0; ndeaths = 0; totvacc = 0; svacc = 0; npopvacc = 0;
+	  nbirths = 0; ndeaths = 0; totvacc = 0; 
+	  totbirthon = 0; totbirthoff = 0; svacc = 0; npopvacc = 0;
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
@@ -315,10 +318,12 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	  {
 	  case 0 : 
 	    b = b0; 	    
+	    totbirthon+=1;
 	    break; //Start of birthing season
 
 	  case 1 : 
 	    b = 0.0; 
+	    totbirthoff+=1;
 	    break; //End of birthing season
 
 	  case 2 : 
