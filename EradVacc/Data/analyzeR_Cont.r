@@ -62,7 +62,7 @@ for(i1 in 1:nFixVals1){
 			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
 	    }}#End loops through XVals and YVals
 
-zmin = floor(10*min(PExtMat))/10
+zmin = floor(10*min(PExtMat[!is.na(PExtMat)]))/10
 zmax = 1
 breaks = seq(zmin,zmax,by = 0.05)
 nbreaks = length(breaks)
