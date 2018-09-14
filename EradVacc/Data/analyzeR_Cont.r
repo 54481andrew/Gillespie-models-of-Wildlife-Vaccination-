@@ -1,4 +1,4 @@
-SimName = "DeerMice_Ha_2_PBShortLag"
+SimName = "DeerMice_Base"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -23,7 +23,7 @@ YVals = unique(parmat[,YValName])
 FixValName1 = 'Bp'
 FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'b0'
-FixVals2 = c(40.0)
+FixVals2 = unique(parmat[,FixValName2])
 FixValName3 = 'd'
 FixVals3 = 0.004
 
@@ -36,7 +36,7 @@ nFixVals1 <- length(FixVals1)
 nFixVals2 <- length(FixVals2)
 nFixVals3 <- length(FixVals3)
 
-TCrit <- 365*1 
+TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 
 require(RColorBrewer)
 
@@ -55,13 +55,14 @@ for(i1 in 1:nFixVals1){
                 wifix = parmat[,XValName]==XVal & parmat[,YValName]==YVal & parmat[,FixValName1]==F1 & 
 		      parmat[,FixValName2]==F2 & parmat[,FixValName3]==F3 
 
-		wiTrialsToVacc = which(TExtMat[wifix,] > VaccStartTime) #Which trials had pathogen until time VaccStartTime
+		#Which trials had pathogen until time VaccStartTime
+		wiTrialsToVacc = which(TExtMat[wifix,] > (VaccStartTime + XVal))
 		NTrialsToVacc = length(wiTrialsToVacc)
-                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] > VaccStartTime + TCrit+
-			       ifelse(YValName=='TPathInv',YVal,0))/NTrialsToVacc
-            }
-	}
-zmin = floor(10*min(PExtMat[!is.na(PExtMat)]))/10
+                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] > 
+			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+	    }}#End loops through XVals and YVals
+
+zmin = floor(10*min(PExtMat))/10
 zmax = 1
 breaks = seq(zmin,zmax,by = 0.05)
 nbreaks = length(breaks)
@@ -75,8 +76,9 @@ axistext <- function(GraphMe){
 }
 
 if(zmin < zmax){
-            FileName = paste('PExt_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='')      
-            png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', res = 400)
+            FileName = paste('PExt_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='') 
+            png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', 
+	    	     res = 400)
             par(mai = c(1,1,0.25,0.25))
 	    layout(mat = matrix(c(1,2),ncol = 2), widths = c(1,0.2))
 	    

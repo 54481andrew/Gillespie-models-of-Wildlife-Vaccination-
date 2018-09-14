@@ -26,7 +26,7 @@ of a zoonotic pathogen.
 //CONSTANTS
 //********
 const int NTrials = 1000;
-const int TPathLEN = 1;
+const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
 const int BpLEN = 3; double bpvals[] = {0.00003,0.00005,0.00007};
@@ -42,15 +42,15 @@ char SimName[50] = "DeerMice_Base";
 
 std::vector<double> tvVals;
 
-double TPathMIN = 5*365; double TPathMAX = 6*365; 
-std::vector<double> TPathInvVals;
+double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
+std::vector<double> TVaccStartVals;
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
 
 double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
-int SInit = 10000;
+int SInit = 1000;
 
 //********
 //ARRAYS
@@ -64,7 +64,7 @@ char FileNamePar[50] = "Data/ParMat_";
 char FileNameTExt[50] = "Data/TExtMat_";
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
-double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
+double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TVaccStart;
 std::ofstream out_data;
 
 //OTHER VARIABLES
@@ -121,7 +121,7 @@ int main()
       tb = ParMat[Par][8]; //tb
       T = ParMat[Par][9]; //T
       IpInit = (int) ParMat[Par][10]; // Initial level of pathogen upon invasion
-      TPathInv = ParMat[Par][11]; // Time of pathogen invasion
+      TVaccStart = ParMat[Par][11]; // Time at which vaccination starts
  
       for(ntrial = 0; ntrial < NTrials; ntrial++)
 	{
@@ -134,18 +134,16 @@ int main()
 
 	  
 	  //Simulate to quasi steady state (rewrites State)
-	  Nv = 0; //No vaccination at first
-	  OneSim(0.0, TPathInv, false);
+	  Nv = 0.0; //No vaccination at first
+	  OneSim(0.0, TVaccStart, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  Nv = ParMat[Par][4]; //Nv 
-	  OneSim(TPathInv, TMax, true);
+	  OneSim(TVaccStart, TMax, true);
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
-	      
-	  //	  std::cout << "Sim Trial: " << ntrial << std::endl;
-	  
+	      	  
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -229,18 +227,18 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(1, 365, tvLEN);
-  TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
+  tvVals = Seq(0.1, 364.9, tvLEN);
+  TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1,500,NvLEN);
+  NvVals = Seq(1.0,500.0,NvLEN);
   
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
     for(int i2=0; i2<BpVals.size(); i2++)
-      for(int i3=0; i3<TPathInvVals.size(); i3++)
+      for(int i3=0; i3<TVaccStartVals.size(); i3++)
 	for(int i4=0; i4<IpInitVals.size(); i4++)
 	  for(int i5=0; i5<NvVals.size(); i5++)
 	    {
@@ -255,7 +253,7 @@ void Initialize()
 	      ParMat[i][8] = 90.0; //tb
 	      ParMat[i][9] = 365.0; //T
 	      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-	      ParMat[i][11] = TPathInvVals[i3]; //TPathInv
+	      ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
 	      i++;
 	    }
 }
@@ -290,21 +288,21 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
       GetTime(); //Get time to next event
       
       CheckEventConflict(); //Finds whichmin, the time of the next conflict
-      //      std::cout<<dTime << "  " << t << "\n";
+
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-	  //	  std::cout<<dTime << "  " << t << "  Gil" << "\n";
+
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
 	dTime = whichmin;
-	//	std::cout<<dTime << "  " << t << "  Con" << "  " << whichindex <<  "\n";
+
 	switch(whichindex)
 	  {
-	  case 0 : b = b0; break;//Start of birthing season
-	  case 1 : b = 0.0; break;//End of birthing season
-	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
+	  case 0 : b = b0; break; //Start of birthing season
+	  case 1 : b = 0.0; break; //End of birthing season
+	  case 2 : VaccFun(); break; //Update S,Iv due to vaccination 
 	  }
 	if(dTime<Nudge)
 	  {dTime+=Nudge;}

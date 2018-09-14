@@ -30,7 +30,7 @@ const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
 const int BpLEN = 2; double bpvals[] = {0.0125,0.0187};
-const int NvLEN = 3; double nvvals[] = {180, 360, 450};
+const int NvLEN = 3; double nvvals[] = {180.0, 360.0, 450.0};
 
 const int NParSets = 12168;
 
@@ -44,7 +44,7 @@ char SimName[50] = "Freq_DeerMice_Base";
 
 std::vector<double> tvVals;
 
-double TPathMIN = 8*365; double TPathMAX = 9*365; 
+double TPathMIN = 8*365+0.01; double TPathMAX = 9*365-0.01; 
 std::vector<double> TPathInvVals;
 
 
@@ -55,7 +55,7 @@ std::vector<int> IpInitVals;
 
 double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
-int SInit = 10000;
+int SInit = 1000;
 
 //********
 //ARRAYS

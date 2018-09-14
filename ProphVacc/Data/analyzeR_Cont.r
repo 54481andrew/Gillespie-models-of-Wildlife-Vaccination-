@@ -1,4 +1,4 @@
-SimName = "Freq_DeerMice_Ha_2_PBShortLag_TMax1Yr"
+SimName = "DeerMice_Base"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -24,7 +24,7 @@ FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'IpInit'
 FixVals2 = c(1,5,10)
 FixValName3 = 'Nv'
-FixVals3 = c(450)
+FixVals3 = unique(parmat[,FixValName3])
 
 FigFold = paste(SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
@@ -74,8 +74,8 @@ if(zmin < zmax){
 		    xaxt = 'n', yaxt = 'n')
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = T, at = axislabs)
-	    axis(side = 2, labels = axislabs, at = seq(5*365,6*365, by = 60))
+	    axis(side = 1, labels = T, at = seq)
+	    axis(side = 2, labels = axislabs, at = seq(8*365,9*365, by = 60))
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)
