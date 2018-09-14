@@ -25,6 +25,7 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
+<<<<<<< HEAD
 const int NTrials = 100;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={50};
@@ -33,18 +34,31 @@ const int BpLEN = 1; double bpvals[] = {0.00005};
 const int NvLEN = 1; double nvvals[] = {00};
 
 const int NParSets = 1;
+=======
+const int NTrials = 1000;
+const int TPathLEN = 26;
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
+const int tvLEN = 26;
+const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
+const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
+>>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
 
+const int NParSets = 12168;
 
 const int NumPars = 12;
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Test";
+char SimName[50] = "DeerMice_Base";
 
 std::vector<double> tvVals;
 
+<<<<<<< HEAD
 double TPathMIN = 10*365; double TPathMAX = 11*365; 
+=======
+double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
+>>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
 std::vector<double> TPathInvVals;
 
 
@@ -53,9 +67,14 @@ std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
 
+<<<<<<< HEAD
 double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+=======
+>>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
 
-int SInit = 10000;
+double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+
+int SInit = 1000;
 
 //********
 //ARRAYS
@@ -105,13 +124,16 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
-  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
-    {
       if(VerboseWriteFlag){
 	strcat(DirName, SimName);  
 	mkdir(DirName, ACCESSPERMS);
 	strcat(DirName, "/");	  
 	strcpy(FileNameDat, DirName);
+      }
+
+  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
+    {
+      if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
@@ -236,7 +258,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(300.1, 364.9, tvLEN);
+  tvVals = Seq(0.1, 364.9, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
@@ -255,7 +277,7 @@ void Initialize()
 	    ParMat[i][3] = BpVals[i2]; //Bp
 	    ParMat[i][4] = NvVals[i5]; //Nv
 	    ParMat[i][5] = tvVals[i1]; //tv
-	    ParMat[i][6] = 0.7; //gamv
+	    ParMat[i][6] = 0.07; //gamv
 	    ParMat[i][7] = 0.007; //gamp
 	    ParMat[i][8] = 90.0; //tb
 	    ParMat[i][9] = 365.0; //T
