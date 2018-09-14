@@ -105,13 +105,16 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
-  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
-    {
       if(VerboseWriteFlag){
 	strcat(DirName, SimName);  
 	mkdir(DirName, ACCESSPERMS);
 	strcat(DirName, "/");	  
 	strcpy(FileNameDat, DirName);
+      }
+
+  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
+    {
+      if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
