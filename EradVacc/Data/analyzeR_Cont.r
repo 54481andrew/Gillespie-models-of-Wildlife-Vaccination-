@@ -1,11 +1,11 @@
-SimName = "DeerMice_Base"
+SimName = "Test_DeerMice_Base"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
 NTrials = 1000
-VaccStartTime = 5*365 #Time at which vaccination is started
+VaccStartTime = 8*365 #Time at which vaccination is started
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
@@ -40,6 +40,8 @@ TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st
 
 require(RColorBrewer)
 
+ii = 1
+vaccset = c()
 i = 1
 for(i1 in 1:nFixVals1){
     for(i2 in 1:nFixVals2){
@@ -60,6 +62,8 @@ for(i1 in 1:nFixVals1){
 		NTrialsToVacc = length(wiTrialsToVacc)
                 PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] > 
 			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+	       vaccset[ii] = NTrialsToVacc 
+			       ii = ii + 1
 	    }}#End loops through XVals and YVals
 
 zmin = floor(10*min(PExtMat))/10

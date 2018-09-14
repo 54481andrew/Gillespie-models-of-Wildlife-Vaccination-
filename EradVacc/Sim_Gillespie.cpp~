@@ -29,20 +29,20 @@ const int NTrials = 1000;
 const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
-const int BpLEN = 3; double bpvals[] = {0.00003,0.00005,0.00007};
-const int NvLEN = 52;
-const int NParSets = 8112;
+const int BpLEN = 1; double bpvals[] = {0.00007};
+const int NvLEN = 1;
+const int NParSets = 52;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base";
+char SimName[50] = "Test_DeerMice_Base";
 
 std::vector<double> tvVals;
 
-double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
+double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
@@ -96,12 +96,15 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
+  if(VerboseWriteFlag){
+    strcat(DirName, SimName);  
+    mkdir(DirName, ACCESSPERMS);
+    strcat(DirName, "/");	  
+  }
+
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
-	strcat(DirName, SimName);  
-	mkdir(DirName, ACCESSPERMS);
-	strcat(DirName, "/");	  
 	strcpy(FileNameDat, DirName);
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
@@ -227,12 +230,13 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  //tvVals.assign(tvvals, tvvals + tvLEN); //Run a discrete set of tvvals
+   tvVals = Seq(85.0, 95.0, tvLEN); //Run a Seq() of values
   TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1.0,500.0,NvLEN);
+  NvVals = Seq(250.0,500.0,NvLEN);
   
   //Fill in ParMat
   int i = 0;
@@ -362,7 +366,6 @@ void WriteMat(double *arr, int NRow, int NCol, char*filename)
     {
       for(j=0; j<NCol; j++)
 	{
-	  //	  out_data << arr[i][j] << " "; 
 	  out_data << *((arr+i*NCol) + j) << " "; 
 	}
       out_data << std::endl;

@@ -25,7 +25,7 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 //********
-const int NTrials = 1000;
+const int NTrials = 10000;
 const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
@@ -34,7 +34,7 @@ const int NvLEN = 1;
 const int NParSets = 52;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
@@ -68,9 +68,9 @@ double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod,
 std::ofstream out_data;
 
 //OTHER VARIABLES
-int ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
+int svacc, npopvacc, temp, totvacc, ntrial, whichindex, nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
 double whichmin, unif, tmodT;
-double Nudge = 0.000001;
+double Nudge = 0.0000001;
 
 //FUNCTION DECLARATIONS
 void CheckEventConflict();
@@ -88,8 +88,8 @@ void WriteMat(double *arr, int NRow, int NCol, char* filename);
 //MAIN
 int main()
 {
-  srand ( time(NULL) );
-
+  //srand ( time(NULL) );
+  srand(1.0);
   strcat(FileNamePar, SimName);  
   strcat(FileNameTExt, SimName);  
   Initialize(); //Fill in the parameter matrix
@@ -109,7 +109,7 @@ int main()
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
-	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n";
+	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death svacc npopvacc nvacc\n";
       }
       
       //Extract parameters
@@ -221,7 +221,7 @@ void GetTime (){
   // Select random time step (doesn't allow for infite time step)
   do
     {
-      dTime = (double) rand() / RAND_MAX ; //Use var dTime for storage
+      dTime = (double) rand() / RAND_MAX; //Use var dTime for storage
       dTime = -log(dTime) / Event_Rate; //Assign next timestep
     } while (dTime == INFINITY); //Avoid infinite timesteps
 }
@@ -264,6 +264,10 @@ void Initialize()
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 {
+  temp = 0; //TRACKS NUMBER OF VACCS 
+  svacc = 0;
+  npopvacc = 0;
+  totvacc = 0;
   //Set initial conditions: No Pathogen, no vaccination
   ti = StartTime;
   t = StartTime;
@@ -282,9 +286,14 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	{
 	  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << 
 	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
-	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << "\n"; 
 	  ti += tick;
-	  nbirths = 0; ndeaths = 0;
+	  if(totvacc > 1)
+	    {
+	      std::cout << "Too many vaccinations!\n";
+	      abort();
+	    }
+	  nbirths = 0; ndeaths = 0; totvacc = 0; svacc = 0; npopvacc = 0;
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
@@ -295,29 +304,41 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-
 	  ApplyEvent();	
+	  //	  t += dTime;
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
-	dTime = whichmin;
+	//	dTime = whichmin;
 
 	switch(whichindex)
 	  {
-	  case 0 : b = b0; break; //Start of birthing season
-	  case 1 : b = 0.0; break; //End of birthing season
-	  case 2 : VaccFun(); break; //Update S,Iv due to vaccination 
+	  case 0 : 
+	    b = b0; 	    
+	    break; //Start of birthing season
+
+	  case 1 : 
+	    b = 0.0; 
+	    break; //End of birthing season
+
+	  case 2 : 
+	    VaccFun(); 
 	  }
-	if(dTime<Nudge)
-	  {dTime+=Nudge;}
+	//	  std::cout << whichindex << "\n";
+
+	  /*if(dTime<Nudge)
+	  {dTime+=Nudge;
+	  }*/
+	dTime = whichmin + Nudge;
       }    
-      t += dTime;
+
+      t+=dTime;
       tmodT = std::fmod(t,T);
     }//End While
   
   if(VerboseWriteFlag)
     {
-      out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+      out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << "\n"; 
     }
 }
 
@@ -350,10 +371,15 @@ std::vector<double> Seq(double minval, double maxval, int lengthval) {
 //************************************
 //Vaccination function
 void VaccFun(){
-  int temp = (int) round( (double) Nv*S/(std::max(NPop,1)));
+  temp = ((int) (Nv*((double) S/NPop))); //round( (double) Nv*S/(std::max(NPop,1)));
   temp  = std::min( temp,  S);
+  svacc = S;
+  npopvacc = NPop;
+  totvacc+=1;
   S -= temp;
   Iv += temp;
+  //if(t > TVaccStart)
+    //    std::cout << temp << "\n";
 }
 
 //************************************
