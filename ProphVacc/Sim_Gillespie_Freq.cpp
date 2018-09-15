@@ -24,11 +24,11 @@ of a zoonotic pathogen.
 //***********
 //CONSTANTS
 //***********
-const int NTrials = 100;
+const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
-const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
+const int BpLEN = 2; double bpvals[] = {0.0125, 0.0187};
 const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
 
 const int NParSets = 12168;
@@ -38,7 +38,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base";
+char SimName[50] = "Freq_DeerMice_Base";
 
 std::vector<double> tvVals;
 

@@ -23,7 +23,7 @@ of a zoonotic pathogen.
 //***********
 //CONSTANTS
 //***********
-const int NTrials = 100;
+const int NTrials = 1000;
 const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
@@ -301,7 +301,7 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	  case 0 : b = b0; totbirthson++; break; //Start of birthing season
 	  case 1 : b = 0.0; totbirthsoff++; break; //End of birthing season
 	  case 2 : VaccFun(); totvacc++; //Update S,Iv due to vaccination 
-	  }
+	  }//End else
 	dTime = whichmin + Nudge; //Nudge ensures that t moves past conflict
       }    
 

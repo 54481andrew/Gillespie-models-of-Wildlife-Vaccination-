@@ -23,7 +23,7 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 //********
-const int NTrials = 100;
+const int NTrials = 1000;
 const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;

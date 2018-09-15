@@ -4,7 +4,7 @@ names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit',
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
-NTrials = 1000
+NTrials = 100
 
 TExtMatFile = paste('TExtMat_',SimName, sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
@@ -22,7 +22,7 @@ YVals = unique(parmat[,YValName])
 FixValName1 = 'Bp'
 FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'IpInit'
-FixVals2 = c(1,5,10)
+FixVals2 = unique(parmat[,FixValName2])
 FixValName3 = 'Nv'
 FixVals3 = unique(parmat[,FixValName3])
 
@@ -74,7 +74,7 @@ if(zmin < zmax){
 		    xaxt = 'n', yaxt = 'n')
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = T, at = seq)
+	    axis(side = 1, labels = T, at = seq(0,365, by = 60))
 	    axis(side = 2, labels = axislabs, at = seq(8*365,9*365, by = 60))
 
 	    #Build legend bar
