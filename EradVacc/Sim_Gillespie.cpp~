@@ -50,7 +50,7 @@ std::vector<int> IpInitVals;
 
 double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
-int SInit = 10000;
+int SInit = 1000;
 
 //********
 //ARRAYS
@@ -227,7 +227,7 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(1, 365, tvLEN);
+  tvVals = Seq(0.1, 364.9, tvLEN);
   TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.00001,0.0001,BpLEN);
