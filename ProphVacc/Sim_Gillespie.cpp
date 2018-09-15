@@ -6,8 +6,6 @@ model. The simulation procedes according
 to the Gillespie algorithm, and simulates 
 the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
-
--This sim is TRUE Gillespie
 */
 
 #include <iostream> // input/output std::cout, cin
@@ -22,10 +20,10 @@ of a zoonotic pathogen.
 
 //---------------------------------------------------------START HEADER FILE
 
-//********
+//***********
 //CONSTANTS
-
-const int NTrials = 1000;
+//***********
+const int NTrials = 100;
 const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
@@ -34,7 +32,7 @@ const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
 
 const int NParSets = 12168;
 
-const int NumPars = 12;
+const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
@@ -45,26 +43,25 @@ std::vector<double> tvVals;
 
 double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
 std::vector<double> TPathInvVals;
-
-
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
-
 std::vector<int> IpInitVals; 
 
-
+//TMax is the time beyond pathogen introduction that should be simulated
 double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
 //********
 //ARRAYS
+//********
 double ParMat [NParSets][NumPars];
 double TExtMat [NParSets][NTrials];
 double IpMat [NParSets][NTrials];
 
-//********
+//*******************
 //CRITICAL VARIABLES
+//*******************
 int S, Iv, Ip, V, P, NPop, Par, IpInit;
 char FileNamePar[50] = "Data/ParMat_"; 
 char FileNameTExt[50] = "Data/TExtMat_";
@@ -75,10 +72,10 @@ double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod,
 std::ofstream out_data;
 
 //OTHER VARIABLES
-int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death;
+int nbirths, ndeaths, ninfv, ninfp, nrecv, nrecp, S_death, Iv_death, Ip_death, V_death, P_death, svacc, npopvacc, totvacc, totbirthson, totbirthsoff;
 int ntrial, whichindex;
 double whichmin, unif, tmodT;
-double Nudge = 0.000001;
+double Nudge = 0.0000001;
 
 //FUNCTION DECLARATIONS
 void CheckEventConflict();
@@ -105,17 +102,19 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
+  if(VerboseWriteFlag){
+    strcat(DirName, SimName);  
+    mkdir(DirName, ACCESSPERMS);
+    strcat(DirName, "/");	   
+  }
+
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
-	strcat(DirName, SimName);  
-	mkdir(DirName, ACCESSPERMS);
-	strcat(DirName, "/");	  
-	strcpy(FileNameDat, DirName);
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
-	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n";
+	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death svacc npopvacc totvacc totbirthson totbirthsoff\n";
       }
       
       //Extract parameters
@@ -146,8 +145,8 @@ int main()
 
 	  //Simulate invasion until TMax years, or pathogen extinction
 	  Ip = IpInit; NPop +=IpInit;
-	  //OneSim(TPathInv, TMax, true);
 	  OneSim(TPathInv,TPathInv+TMax, true);
+
 	  //Store final value of t in TExtMat,
 	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
@@ -277,18 +276,16 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
   //Track births, deaths, recoveries, etc for error checking
   nbirths = 0; ndeaths = 0; ninfv = 0; ninfp = 0; nrecv = 0; 
   nrecv = 0; S_death = 0; Iv_death = 0; Ip_death = 0;  
-  V_death = 0; P_death = 0;
+  V_death = 0; P_death = 0; svacc = 0; npopvacc = 0; 
+  totvacc = 0; totbirthson = 0; totbirthsoff = 0;
 
   while(t < EndTime && (Ip > 0 || !StopOnErad))
     {
       if( t >= ti && VerboseWriteFlag) //Write old values at intervals "tick"
 	{
-	  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << 
-	    NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << 
-	    " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+	  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << " " << totbirthson << " " <<  totbirthsoff << "\n"; 
 	  ti += tick;
-	  nbirths = 0; ndeaths = 0;
-
+	  nbirths = 0; ndeaths = 0; svacc = 0; npopvacc = 0; totvacc = 0; totbirthson = 0; 
 	}  
       Event_Rate = b + d*NPop + Bp*S*Ip + Bp*Iv*Ip + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
@@ -299,29 +296,27 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 
       if(dTime < whichmin) //If no conflicts, proceed with Gillepsie event
 	{
-
 	  ApplyEvent();	
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
-	dTime = whichmin;
-
 	switch(whichindex)
 	  {
-	  case 0 : b = b0; break;//Start of birthing season
-	  case 1 : b = 0.0; break;//End of birthing season
-	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
+	  case 0 : b = b0; totbirthson++; break; //Start of birthing season
+	  case 1 : b = 0.0; totbirthsoff++; break; //End of birthing season
+	  case 2 : VaccFun(); totvacc++; //Update S,Iv due to vaccination 
 	  }
-	if(dTime<Nudge)
-	  {dTime+=Nudge;}
-      }    
+	dTime = whichmin + Nudge; //Nudge ensures that t moves past conflict
+      }//End else
+
       t += dTime;
       tmodT = std::fmod(t,T);
+
     }//End While
   
   if(VerboseWriteFlag)
     {
-      out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << "\n"; 
+      out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << " " << totbirthson << " " << totbirthsoff << "\n"; 
     }
 }
 
@@ -370,7 +365,6 @@ void WriteMat(double *arr, int NRow, int NCol, char*filename)
     {
       for(j=0; j<NCol; j++)
 	{
-	  //	  out_data << arr[i][j] << " "; 
 	  out_data << *((arr+i*NCol) + j) << " "; 
 	}
       out_data << std::endl;

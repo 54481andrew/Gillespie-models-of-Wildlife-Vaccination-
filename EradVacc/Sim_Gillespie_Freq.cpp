@@ -20,9 +20,9 @@ of a zoonotic pathogen.
 
 //---------------------------------------------------------START HEADER FILE
 
-//********
+//***********
 //CONSTANTS
-//********
+//***********
 const int NTrials = 100;
 const int TVaccLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={100};
@@ -52,6 +52,7 @@ int SInit = 1000;
 
 //********
 //ARRAYS
+//********
 double ParMat [NParSets][NumPars];
 double TExtMat [NParSets][NTrials];
 
@@ -133,7 +134,6 @@ int main()
 	  V = 0; //V
 	  P = 0; //P
 	  NPop = S + Iv + Ip + V + P;
-
 	  
 	  //Simulate to quasi steady state (rewrites State)
 	  Nv = 0.0; //No vaccination at first
@@ -144,8 +144,7 @@ int main()
 	  OneSim(TVaccStart, TMax, true);
 	  
 	  //Store final value of t in TExtMat
-	  TExtMat[Par][ntrial] = t;
-	      
+	  TExtMat[Par][ntrial] = t;	      
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
