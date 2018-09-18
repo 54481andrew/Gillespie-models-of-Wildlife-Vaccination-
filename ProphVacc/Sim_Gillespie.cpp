@@ -23,25 +23,25 @@ of a zoonotic pathogen.
 //***********
 //CONSTANTS
 //***********
-const int NTrials = 1000;
+const int NTrials = 30;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={10};
 const int tvLEN = 26;
 const int BpLEN = 1; double bpvals[] = {0.00007};
 const int NvLEN = 3; double nvvals[] = {450.0};
 
-const int NParSets = 12168;
+const int NParSets = 26;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base";
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
-double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
+double TPathMIN = 8*365+175.2; double TPathMAX = 9*365 - 0.01; 
 std::vector<double> TPathInvVals;
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
