@@ -1,4 +1,4 @@
-SimName = "Freq_DeerMice_Base"
+SimName = "DeerMice_Base"
 parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
