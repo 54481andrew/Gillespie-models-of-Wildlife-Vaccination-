@@ -1,12 +1,12 @@
-SimName = "Freq_DeerMice_Base"
-parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
+SimName = "Test"
+parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
 NPars = nrow(parmat)
-NTrials = 1000
+NTrials = 100
 
-TExtMatFile = paste('TExtMat_',SimName, sep = '')
+TExtMatFile = paste(SimName,'/TExtMat', sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
 
 
@@ -53,10 +53,10 @@ for(i1 in 1:nFixVals1){
                 F3 = FixVals3[i3]
                 wifix = parmat[,XValName]==XVal & parmat[,YValName]==YVal & parmat[,FixValName1]==F1 & 
 		      parmat[,FixValName2]==F2 & parmat[,FixValName3]==F3 
-                PExtMat[Xi,Yi] = sum(TExtMat[wifix,] > TCrit+YVal)/NTrials	                       
+                PExtMat[Xi,Yi] = sum(TExtMat[wifix,] >= TCrit+YVal)/NTrials	                       
             }
 	}
-zmin = floor(10*min(PExtMat))/10
+zmin = 0#floor(10*min(PExtMat))/10
 zmax = 1
 breaks = seq(zmin,zmax,by = 0.01)
 nbreaks = length(breaks)
