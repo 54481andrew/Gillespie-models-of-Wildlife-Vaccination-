@@ -1,5 +1,5 @@
-SimName = "DeerMice_Base"
-parmat = read.table(file = paste("ParMat_", SimName, sep=''), header = F)
+SimName = "Freq_DeerMice_Base"
+parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
 parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
@@ -7,7 +7,7 @@ NPars = nrow(parmat)
 NTrials = 1000
 VaccStartTime = 8*365 #Time at which vaccination is started
 
-TExtMatFile = paste('TExtMat_',SimName, sep = '')
+TExtMatFile = paste(SimName,'/TExtMat', sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
 
 
@@ -84,12 +84,16 @@ if(zmin < zmax){
 	    
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
 		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
+	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), 
+	    	      add = T)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = axislabs)
 	    axis(side = 2, labels = T, at = seq(0,5000,length.out = 21))
 	    mtext(text = axistext(XValName),side = 1, line = 3)
 	    mtext(text = axistext(YValName),side = 2, line = 3)
+
+	    abline(v = parmat$tb[1], lwd = 3, lty = 3)
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)

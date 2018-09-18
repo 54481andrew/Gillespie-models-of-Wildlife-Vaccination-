@@ -72,7 +72,7 @@ if(zmin < zmax){
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
 	    	    xlab = 'Time of Vaccination', ylab = 'Time of Pathogen Invasion', 
 		    xaxt = 'n', yaxt = 'n')
-	    contour(x = XVals, y = YVals, z = PExtMat, levels = breaks, add = T)
+	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), add = T)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = seq(8*365,9*365, by = 60))
