@@ -25,10 +25,21 @@ of a zoonotic pathogen.
 
 const int NTrials = 100;
 const int TPathLEN = 1;
+<<<<<<< HEAD
 const int IpInitLEN = 1; int ipinitvals[]={50};
 const int tvLEN = 10;
 const int BpLEN = 1; double bpvals[] = {0.00005};
 const int NvLEN = 1; double nvvals[] = {450};
+=======
+const int IpInitLEN = 1; int ipinitvals[]={10};
+const int tvLEN = 3;
+const int BpLEN = 1; double bpvals[] = {0.00007};
+const int NvLEN = 1; double nvvals[] = {450};
+
+const int NParSets = 3;
+
+
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
 
 const int NParSets = 10;
 const int NumPars = 12;
@@ -38,18 +49,26 @@ const bool VerboseWriteFlag = true;
 //USER-ASSIGNED VARIABLES
 char SimName[50] = "Test";
 
-std::vector<double> tvVals;
 
+<<<<<<< HEAD
 
 double TPathMIN = 10*365; double TPathMAX = 11*365; 
+=======
+double TPathMIN = 10.0*365 + 179.0; double TPathMAX = 11.0*365; 
+
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
 std::vector<double> TPathInvVals;
 
 
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
-
+std::vector<double> tvVals; int tvvals[] = {172,179.0, 186.0};
 std::vector<int> IpInitVals; 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
 double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
@@ -67,7 +86,11 @@ char FileNamePar[50] = "Data/ParMat_";
 char FileNameTExt[50] = "Data/TExtMat_";
 char FileNameIpMat[50] = "Data/IpMat_";
 char DirName[50] = "Data/";
-char FileSuffix[50], FileNameDat[50];
+      char FileSuffix[5];
+	char FileNameDat[50];
+
+
+
 double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;
 std::ofstream out_data;
 
@@ -117,12 +140,24 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
+<<<<<<< HEAD
+=======
+      if(VerboseWriteFlag){
+	strcat(DirName, SimName);  
+	mkdir(DirName, ACCESSPERMS);
+	strcat(DirName, "/");	  
+      }
+
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
-      if(VerboseWriteFlag){
+      if(VerboseWriteFlag){	
+	strcpy(FileNameDat, DirName);
 	sprintf(FileSuffix, "Par_%d",Par);
 	strcpy(FileNameDat, DirName);
 	strcat(FileNameDat, FileSuffix);
+	//	std::cout << FileSuffix << "\n";
+	//	std::cout << FileNameDat << "\n";
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n";
       }
@@ -245,9 +280,15 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+
+  //  tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals.assign(tvvals,tvvals + tvLEN);
+  
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
+
   BpVals.assign(bpvals, bpvals + BpLEN);
+
+  
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
   NvVals.assign(nvvals, nvvals + NvLEN);
   //Fill in ParMat
@@ -313,13 +354,22 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
+<<<<<<< HEAD
+=======
+	dTime = whichmin + Nudge;
+
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
 	switch(whichindex)
 	  {
 	  case 0 : b = b0; break;//Start of birthing season
 	  case 1 : b = 0.0; break;//End of birthing season
 	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
 	  }
+<<<<<<< HEAD
       }    
+=======
+      }
+>>>>>>> d53a4b21f94a1bd3adbc001e3cd73ac32dae3ec4
       t += dTime;
       tmodT = std::fmod(t,T);
       dTime = whichmin + Nudge;

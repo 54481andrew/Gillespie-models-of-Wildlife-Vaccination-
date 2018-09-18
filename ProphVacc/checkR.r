@@ -5,14 +5,15 @@ names(parmat) = c('NPar','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit'
 require(deSolve)
 source('Tools/Functions.r', local = TRUE)
 
-times = seq(0,10000)
-y0 = c(10000, 0, 0, 0, 0)
-names(y0) = c('S','Iv','Ip','V','P')
+times = seq(0,1000)
 
 maxtimes <- 365*10
 timeseq  <- seq(0,maxtimes, by = 0.01)
 
 for(i in 1:length(parmat$NPar)){
+
+    y0 = c(1000, 0, 0, 0, 0)
+    names(y0) = c('S','Iv','Ip','V','P')
 
     VaccPer        <- parmat$T[i]
     NVacc          <- parmat$Nv[i]
@@ -42,14 +43,14 @@ for(i in 1:length(parmat$NPar)){
     out = rbind(out1, out2[-1,])			
 
 ###Calculate anticipated pathogen R0 from out1
-    Sfun  <- approxfun(out1$time, out1$S + out1$Iv)
-    Savg  <- 1/365*integrate(Sfun, lower = tpathinv-365, tpathinv)$value
-    R0p   <- with(parmat[i,], Bp*Savg/(d + gamp))
+#    Sfun  <- approxfun(out1$time, out1$S + out1$Iv)
+#    Savg  <- 1/365*integrate(Sfun, lower = tpathinv-365, tpathinv)$value
+#    R0p   <- with(parmat[i,], Bp*Savg/(d + gamp))
     
     #Big Picture
     pdf(file = paste(filename, "_big.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(0,tpathinv + 365*10), ylim = c(0,800), type = 'l', lwd = 1)
+    plot(S~time, out, xlim = c(0,tpathinv + 365*10), ylim = c(0,1000), type = 'l', lwd = 1)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 1)
     lines(Ip~time, out, col = 'red', lty = 1, lwd = 1)
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
@@ -75,7 +76,7 @@ for(i in 1:length(parmat$NPar)){
     #Small Picture
     pdf(file = paste(filename, "_small.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(0,tpathinv + 10*365), ylim = c(0,800), type = 'l', lwd = 4)
+    plot(S~time, out, xlim = c(0,tpathinv + 10*365), ylim = c(0,400), type = 'l', lwd = 4)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 4)
     lines(Ip~time, out, col = 'red', lty = 1, lwd = 4)
     lines(V~time, out, col = 'blue', lty = 1, lwd = 4)
@@ -104,14 +105,14 @@ for(i in 1:length(parmat$NPar)){
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 4)
 
     lines(V~time, out, col = 'blue', lty = 1, lwd = 4)
-    #lines(P~time, out, col = 'pink', lty = 1, lwd = 4)
+    lines(P~time, out, col = 'pink', lty = 1, lwd = 4)
     
-    these <- seq(1,nrow(dat), by = 1)
-    #points(S~time, dat[these,], col = 'black', cex = 0.2, pch = 1)
-    #points(Iv~time, dat[these,], col = 'green', cex = 0.2, pch = 1)
+    these <- seq(1,nrow(dat), by = 1000)
+    points(S~time, dat[these,], col = 'black', cex = 0.2, pch = 1)
+    points(Iv~time, dat[these,], col = 'green', cex = 0.2, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.2, pch = 1)
-    #points(V~time, dat[these,], col = 'blue', cex = 0.2, pch = 1)
-    #points(P~time, dat[these,], col = 'pink', cex = 0.2, pch = 1)
+    points(V~time, dat[these,], col = 'blue', cex = 0.2, pch = 1)
+    points(P~time, dat[these,], col = 'pink', cex = 0.2, pch = 1)
 
     lines(Ip~time, out, col = 'black', lty = 1, lwd = 4)
     
