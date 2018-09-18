@@ -24,11 +24,11 @@ of a zoonotic pathogen.
 //CONSTANTS
 //***********
 const int NTrials = 1000;
-const int TPathLEN = 26;
-const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
+const int TPathLEN = 1;
+const int IpInitLEN = 1; int ipinitvals[]={10};
 const int tvLEN = 26;
-const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
-const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
+const int BpLEN = 1; double bpvals[] = {0.00007};
+const int NvLEN = 3; double nvvals[] = {450.0};
 
 const int NParSets = 12168;
 
