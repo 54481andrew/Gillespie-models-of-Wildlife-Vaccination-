@@ -23,26 +23,24 @@ of a zoonotic pathogen.
 //***********
 //CONSTANTS
 //***********
-const int NTrials = 100;
-const int TPathLEN = 1;
+const int NTrials = 1000;
+const int TPathLEN = 26;
 const int IpInitLEN = 1; int ipinitvals[]={10};
-const int tvLEN = 101; //double tvvals[] = {175.204,178.852};
-const int BpLEN = 1; double bpvals[] = {0.00007};
+const int tvLEN = 26; 
+const int BpLEN = 1; double bpvals[] = {0.00005, 0.00007};
 const int NvLEN = 1; double nvvals[] = {450.0};
 
 const int NParSets = 101;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Test";
+char SimName[50] = "DeerMice_Base";
 
 std::vector<double> tvVals;
-
-double TPathMIN = 8*365+175.2; double TPathMAX = 9*365 - 0.01; 
-std::vector<double> TPathInvVals;
+std::vector<double> TPathInvVals; double TPathMIN = 8*365+175.2; double TPathMAX = 9*365 - 0.01; 
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
@@ -63,9 +61,9 @@ double IpMat [NParSets][NTrials];
 //CRITICAL VARIABLES
 //*******************
 int S, Iv, Ip, V, P, NPop, Par, IpInit;
-char FileNamePar[50] = "Data/ParMat_"; 
-char FileNameTExt[50] = "Data/TExtMat_";
-char FileNameIpMat[50] = "Data/IpMat_";
+char FileNamePar[50];
+char FileNameTExt[50];
+char FileNameIpMat[50];
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
 double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TPathInv;

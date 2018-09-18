@@ -60,8 +60,8 @@ double TExtMat [NParSets][NTrials];
 //CRITICAL VARIABLES
 //*******************
 int S, Iv, Ip, V, P, NPop, Par, IpInit;
-char FileNamePar[50] = "Data/ParMat_"; 
-char FileNameTExt[50] = "Data/TExtMat_";
+char FileNamePar[50];
+char FileNameTExt[50];
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
 double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TVaccStart;
@@ -88,19 +88,23 @@ void WriteMat(double *arr, int NRow, int NCol, char* filename);
 //MAIN
 int main()
 {
-  srand ( time(NULL) );
+  srand( time(NULL) );
 
-  strcat(FileNamePar, SimName);  
-  strcat(FileNameTExt, SimName);  
+  //Build directory for simulation results
+  strcat(DirName, SimName);  
+  mkdir(DirName, ACCESSPERMS);
+  strcat(DirName, "/");	  
+
+  //Create filenames within directory for parmat, textmat, ipmat
+  strcpy(FileNamePar, DirName);  
+  strcat(FileNamePar, "ParMat");
+
+  strcpy(FileNameTExt, DirName);
+  strcat(FileNameTExt, "TExtMat");
+
   Initialize(); //Fill in the parameter matrix
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
-
-  if(VerboseWriteFlag){
-    strcat(DirName, SimName);  
-    mkdir(DirName, ACCESSPERMS);
-    strcat(DirName, "/");	   
-  }
 
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
