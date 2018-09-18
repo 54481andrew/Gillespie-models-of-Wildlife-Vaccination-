@@ -6,8 +6,6 @@ model. The simulation procedes according
 to the Gillespie algorithm, and simulates 
 the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
-
--This sim is TRUE Gillespie
 */
 
 #include <iostream> // input/output std::cout, cin
@@ -25,40 +23,25 @@ of a zoonotic pathogen.
 //********
 //CONSTANTS
 
-<<<<<<< HEAD
 const int NTrials = 100;
 const int TPathLEN = 1;
 const int IpInitLEN = 1; int ipinitvals[]={50};
-const int tvLEN = 1;
+const int tvLEN = 10;
 const int BpLEN = 1; double bpvals[] = {0.00005};
-const int NvLEN = 1; double nvvals[] = {00};
+const int NvLEN = 1; double nvvals[] = {450};
 
-const int NParSets = 1;
-=======
-const int NTrials = 1000;
-const int TPathLEN = 26;
-const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
-const int tvLEN = 26;
-const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
-const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
->>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
-
-const int NParSets = 12168;
-
+const int NParSets = 10;
 const int NumPars = 12;
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base";
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 
-<<<<<<< HEAD
+
 double TPathMIN = 10*365; double TPathMAX = 11*365; 
-=======
-double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
->>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
 std::vector<double> TPathInvVals;
 
 
@@ -66,11 +49,6 @@ std::vector<double> BpVals;
 std::vector<double> NvVals;
 
 std::vector<int> IpInitVals; 
-
-<<<<<<< HEAD
-double TMax = 10.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
-=======
->>>>>>> 131913d3e40b8dcb3cc1bae2b95bc70940b4a976
 
 double TMax = 1.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -117,24 +95,33 @@ int main()
 {
   srand ( time(NULL) );
 
-  strcat(FileNamePar, SimName);  
+  //Build directory for simulation results
+  strcat(DirName, SimName);  
+  mkdir(DirName, ACCESSPERMS);
+  strcat(DirName, "/");	  
+
+  //Create filenames within directory for parmat, textmat, ipmat
+  strcpy(FileNamePar, DirName);  
+  strcat(FileNamePar, "ParMat_");
+  strcat(FileNamePar, SimName);
+
+  strcpy(FileNameTExt, DirName);
+  strcat(FileNameTExt, "TExtMat_");
   strcat(FileNameTExt, SimName);
+
+  strcpy(FileNameIpMat, DirName);
+  strcat(FileNameIpMat, "IpMat_");
   strcat(FileNameIpMat, SimName);
+
   Initialize(); //Fill in the parameter matrix
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
-
-      if(VerboseWriteFlag){
-	strcat(DirName, SimName);  
-	mkdir(DirName, ACCESSPERMS);
-	strcat(DirName, "/");	  
-	strcpy(FileNameDat, DirName);
-      }
 
   for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
+	strcpy(FileNameDat, DirName);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death\n";
@@ -326,19 +313,16 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	}
       else{ //If conflict, stop at conflict and perform necessary action
 	
-	dTime = whichmin;
-
 	switch(whichindex)
 	  {
 	  case 0 : b = b0; break;//Start of birthing season
 	  case 1 : b = 0.0; break;//End of birthing season
 	  case 2 : VaccFun(); break;//Update S,Iv due to vaccination 
 	  }
-	if(dTime<Nudge)
-	  {dTime+=Nudge;}
       }    
       t += dTime;
       tmodT = std::fmod(t,T);
+      dTime = whichmin + Nudge;
     }//End While
   
   if(VerboseWriteFlag)
