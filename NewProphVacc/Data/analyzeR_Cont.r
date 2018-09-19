@@ -1,4 +1,4 @@
-SimName = "DeerMice_Base"
+SimName = "DeerMice_Base_Freq"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -75,8 +75,10 @@ if(zmin < zmax){
 	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), add = T)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = axislabs, at = seq(8*365,9*365, by = 60))
+	    axis(side = 1, labels = T, at = seq(0,365, by = 60))
 	    axis(side = 2, labels = axislabs, at = seq(8*365,9*365, by = 60))
+
+	    abline(v =parmat$tb[1] , lwd = 3, lty = 3)
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)

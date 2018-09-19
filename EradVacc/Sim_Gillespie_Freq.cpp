@@ -36,7 +36,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Freq_DeerMice_Base";
+char SimName[50] = "DeerMice_Base_Freq";
 
 std::vector<double> tvVals;
 
