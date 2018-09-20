@@ -1,4 +1,4 @@
-SimName = "DeerMice_Base_Freq"
+SimName = "DeerMice_Base"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -72,13 +72,15 @@ if(zmin < zmax){
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
 	    	    xlab = 'Time of Vaccination', ylab = 'Time of Pathogen Invasion', 
 		    xaxt = 'n', yaxt = 'n')
-	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), add = T)
+	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), add = T, labcex = 1)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = T, at = seq(0,365, by = 60))
+	    axis(side = 1, labels = axislabs, at = seq(8*365,9*365, by = 60))
 	    axis(side = 2, labels = axislabs, at = seq(8*365,9*365, by = 60))
 
-	    abline(v =parmat$tb[1] , lwd = 3, lty = 3)
+	    abline(v = parmat$tb[1] + 8*365, lwd = 3, lty = 3)
+#	    abline(b = 1, lwd = 3, lty = 1)
+	    segments(8*365, 8*365, 9*365, 9*365, lwd = 3, lty = 1)	    
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)

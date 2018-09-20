@@ -6,6 +6,10 @@ model. The simulation procedes according
 to the Gillespie algorithm, and simulates 
 the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
+NewProphVacc runs the Gillespie algorithm 
+with the pathogen absent, 
+introduces a pathogen at time
+TPathInv, and begins vaccinating at time tv. 
 */
 
 #include <iostream> // input/output std::cout, cin
@@ -27,10 +31,10 @@ const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 1; int ipinitvals[]={10};
 const int tvLEN = 26; 
-const int BpLEN = 1; double bpvals[] = {0.00005, 0.00007};
-const int NvLEN = 1; double nvvals[] = {450.0};
+const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
+const int NvLEN = 2; double nvvals[] = {200.0,400.0};
 
-const int NParSets = 101;
+const int NParSets = 1352;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -39,8 +43,8 @@ const bool VerboseWriteFlag = false;
 //USER-ASSIGNED VARIABLES
 char SimName[50] = "DeerMice_Base";
 
-std::vector<double> tvVals;
-std::vector<double> TPathInvVals; double TPathMIN = 8*365+175.2; double TPathMAX = 9*365 - 0.01; 
+std::vector<double> tvVals; double tvMIN = 8*365 + 0.1; double tvMAX = 9*365 - 0.1;
+std::vector<double> TPathInvVals; double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
@@ -127,7 +131,7 @@ int main()
       b0 = ParMat[Par][1]; //b0
       d = ParMat[Par][2]; //d
       Bp = ParMat[Par][3]; //Bp
-      Nv = ParMat[Par][4]; //Nv
+      //Nv set manually
       tv = ParMat[Par][5]; //tv
       gamv = ParMat[Par][6]; //gamv
       gamp = ParMat[Par][7]; //gamp
@@ -145,12 +149,38 @@ int main()
 	  P = 0; //P
 	  NPop = S + Iv + Ip + V + P;
 
-	  //Simulate to quasi steady state (rewrites State)
-	  OneSim(0.0, TPathInv, false);
+	  if(TPathInv < tv)
+	    {
+	      //Simulate to quasi steady state (rewrites State)
+	      Nv = 0.0;
+	      OneSim(0.0, TPathInv, false);
+	      
+	      //Simulate invasion until TMax years, or pathogen extinction
+	      Ip = IpInit; NPop +=IpInit;
+	      OneSim(TPathInv,tv, false);
+	      
+	      //Simulate vaccination for 1 year beyond TPathInv
+	      Nv = ParMat[Par][4]; //set Nv
+	      VaccFun(); //Vaccinate once
+	      Nv = 0.0; 
+		
+	      //Continue sim for TMax
+	      OneSim(tv, TPathInv+TMax, true);
+	    }else{
+	    //Simulate to quasi steady state (rewrites State)
+	      Nv = 0.0;
+	      OneSim(0.0, tv, false);
 
-	  //Simulate invasion until TMax years, or pathogen extinction
-	  Ip = IpInit; NPop +=IpInit;
-	  OneSim(TPathInv,TPathInv+TMax, true);
+	      //Simulate vaccination 
+	      Nv = ParMat[Par][4]; //set Nv
+	      VaccFun(); //Vaccinate once
+	      Nv = 0.0; 
+	      OneSim(tv, TPathInv, false);
+
+	      //Simulate invasion until TMax years, or pathogen extinction
+	      Ip = IpInit; NPop +=IpInit;
+	      OneSim(TPathInv,TPathInv+TMax, true);
+	  }
 
 	  //Store final value of t in TExtMat,
 	  //and final Ip value in IpMat.
@@ -241,7 +271,7 @@ void GetTime (){
 void Initialize()
 {
   //tvVals.assign(tvvals, tvvals + tvLEN);
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals = Seq(tvMIN, tvMAX, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
