@@ -28,10 +28,10 @@ const int NTrials = 1000;
 const int TPathLEN = 26;
 const int IpInitLEN = 1; int ipinitvals[]={10};
 const int tvLEN = 26;
-const int BpLEN = 2; double bpvals[] = {0.0125,0.0187};
+const int BpLEN = 3; double bpvals[] = {0.0125,0.0187,0.028};
 const int NvLEN = 2; double nvvals[] = {200.0, 400.0};
 
-const int NParSets = 1352;
+const int NParSets = 4056;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;

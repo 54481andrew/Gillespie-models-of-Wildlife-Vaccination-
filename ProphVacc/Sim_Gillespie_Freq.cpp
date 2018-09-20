@@ -29,16 +29,16 @@ const int TPathLEN = 26;
 const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
 const int BpLEN = 2; double bpvals[] = {0.0125, 0.0187};
-const int NvLEN = 3; double nvvals[] = {180.0,360.0,450.0};
+const int NvLEN = 11; //double nvvals[] = {180.0,360.0,450.0};
 
-const int NParSets = 12168;
+const int NParSets = 44616;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Freq_DeerMice_Base";
+char SimName[50] = "DeerMice_Base_Freq_varNv";
 
 std::vector<double> tvVals;
 
@@ -246,7 +246,9 @@ void Initialize()
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals.assign(nvvals, nvvals + NvLEN);
+  //NvVals.assign(nvvals, nvvals + NvLEN);
+  NvVals = Seq(0,500,NvLEN);
+
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)

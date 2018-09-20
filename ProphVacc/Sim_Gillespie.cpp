@@ -25,22 +25,22 @@ of a zoonotic pathogen.
 //***********
 const int NTrials = 1000;
 const int TPathLEN = 26;
-const int IpInitLEN = 1; int ipinitvals[]={10};
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26; 
-const int BpLEN = 1; double bpvals[] = {0.00005, 0.00007};
-const int NvLEN = 1; double nvvals[] = {450.0};
+const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
+const int NvLEN = 11; double nvvals[] = {450.0};
 
-const int NParSets = 101;
+const int NParSets = 44616;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base";
+char SimName[50] = "DeerMice_Base_varNv_redo";
 
 std::vector<double> tvVals;
-std::vector<double> TPathInvVals; double TPathMIN = 8*365+175.2; double TPathMAX = 9*365 - 0.01; 
+std::vector<double> TPathInvVals; double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
 std::vector<double> BpVals; 
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
@@ -116,7 +116,6 @@ int main()
     {
       if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
-	strcpy(FileNameDat, DirName);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death svacc npopvacc totvacc totbirthson totbirthsoff\n";
@@ -149,13 +148,13 @@ int main()
 	  OneSim(0.0, TPathInv, false);
 
 	  //Simulate invasion until TMax years, or pathogen extinction
-	  Ip = IpInit; NPop +=IpInit;
-	  OneSim(TPathInv,TPathInv+TMax, true);
-
+	  Ip = IpInit; NPop += IpInit;
+	  OneSim(TPathInv, TPathInv+TMax, true);
+	  
 	  //Store final value of t in TExtMat,
 	  //and final Ip value in IpMat.
 	  TExtMat[Par][ntrial] = t;
-	  IpMat[Par][ntrial] = (double) Ip;    
+	  IpMat[Par][ntrial] = (double) Ip;    	      
 	}//End loop through NTrials
 
       if(VerboseWriteFlag)
@@ -198,13 +197,13 @@ void ApplyEvent() {
       else{P--; P_death++;}  //P dies	
       NPop--; ndeaths++;
     }  
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S/NPop)    //Event: Pathogen infection of S
     {S--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop) //Event: Pathogen infection of V
     {Iv--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv + gamp*Ip) //Event: Ip Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {Ip--; P++; nrecp++;}
 }
 
@@ -240,12 +239,12 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  //tvVals.assign(tvvals, tvvals + tvLEN);
   tvVals = Seq(0.1, 364.9, tvLEN);
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals.assign(nvvals, nvvals + NvLEN);
+  //NvVals.assign(nvvals, nvvals + NvLEN);
+  NvVals = Seq(0,500,NvLEN);
 
   //Fill in ParMat
   int i = 0;

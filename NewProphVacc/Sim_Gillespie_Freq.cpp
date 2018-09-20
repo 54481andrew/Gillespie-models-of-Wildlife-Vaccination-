@@ -26,19 +26,19 @@ of a zoonotic pathogen.
 //***********
 const int NTrials = 1000;
 const int TPathLEN = 26;
-const int IpInitLEN = 1; int ipinitvals[]={10};
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26;
-const int BpLEN = 3; double bpvals[] = {0.0125,0.0187,0.028};
-const int NvLEN = 2; double nvvals[] = {200.0, 400.0};
+const int BpLEN = 2; double bpvals[] = {0.0125,0.0187};
+const int NvLEN = 11; //double nvvals[] = {200.0, 400.0};
 
-const int NParSets = 4056;
+const int NParSets = 44616;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_Freq";
+char SimName[50] = "DeerMice_Base_Freq_varNv";
 
 std::vector<double> tvVals; double tvMIN = 8*365 + 0.1; double tvMAX = 9*365 - 0.1;
 double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
@@ -270,7 +270,9 @@ void Initialize()
   TPathInvVals = Seq(TPathMIN, TPathMAX, TPathLEN);
   BpVals.assign(bpvals, bpvals + BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals.assign(nvvals, nvvals + NvLEN);
+  //  NvVals.assign(nvvals, nvvals + NvLEN);
+  NvVals = Seq(0,500,NvLEN);
+
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
