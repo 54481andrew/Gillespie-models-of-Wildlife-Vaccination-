@@ -1,4 +1,13 @@
-SimName = "DeerMice_Base_Freq_varNv"
+BuildDataFlag = FALSE
+FoldName = "Meta1"
+SimNameList = c("NewProphVacc/Data/DeerMice_Base_Freq_varNv")
+
+#Collect all data
+#for(i in 1:length(SimNameList)){
+
+ii = 1
+
+SimName = SimNameList[ii]
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -8,10 +17,6 @@ NTrials = 1000
 
 parmat$NAvg = with(parmat, b0*tb/(d*T))
 parmat$rho = with(parmat, Nv/(b0*tb/(d*T)))
-
-TExtMatFile = paste(SimName,'/TExtMat', sep = '')
-TExtMat = read.table(TExtMatFile, header = FALSE)
-
 
 #####################################
 ######## EXTINCTION PLOT C ##########
@@ -29,7 +34,7 @@ FixVals2 = 10#unique(parmat[,FixValName2])
 FixValName3 = 'Nv'
 FixVals3 = c(100,250,500)#unique(parmat[,FixValName3])
 
-FigFold = paste(SimName,'_Fig',sep='')
+FigFold = paste(FoldName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
 
 nXVals <- length(unique(parmat[,XValName]))
@@ -41,10 +46,25 @@ nFixVals3 <- length(FixVals3)
 TCrit <- 365*1 
 
 require(RColorBrewer)
+require(MASS)
 
-i = 0
+
+if(BuildDataFlag){
+
+TExtMatFile = paste(SimName,'/TExtMat', sep = '')
+TExtMat = read.table(TExtMatFile, header = FALSE)
+
+
+MetaDat = matrix(nrow = nFixVals1*nFixVals2*nFixVals3 + 1, ncol = length(XVals) + 3)
+MetaDat[1,] = c(1,2,3,XVals)
+
+i = 2
 for(i1 in 1:nFixVals1){
     for(i2 in 1:nFixVals2){
+    	   
+    	   F1 = FixVals1[i1]
+	   F2 = FixVals2[i2]
+
     for(i3 in 1:nFixVals3){
         PExtMat = matrix(ncol = nYVals, nrow = nXVals)
         for(Yi in 1:nYVals){
@@ -59,49 +79,46 @@ for(i1 in 1:nFixVals1){
                 PExtMat[Xi,Yi] = sum(TExtMat[wifix,] >= TCrit+YVal)/NTrials	                       
             }
 	}
-zmin = 0#floor(10*min(PExtMat))/10
-zmax = 1
-breaks = seq(zmin,zmax,by = 0.01)
-nbreaks = length(breaks)
-initcols = c('purple', 'orange')#brewer.pal(, "Blues")
-cols = colorRampPalette(initcols)(nbreaks-1)
 
-if(zmin < zmax){
-            FileName = paste('PExt_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='')      
+TPathAvg = rowMeans(PExtMat)
+MetaDat[i,] = c(F1,F2,F3,TPathAvg)	    
+i = i + 1
+
+print(paste("Finished i3: ", i3, sep = " " ))
+
+}     #End loop through FixedVal3
+
+}}#End loop through FixedVals
+
+write.matrix(MetaDat, file = paste(FigFold, '/metadat.txt',sep=''))
+}else{
+	MetaDat = as.matrix(read.table(file = paste(FigFold, '/metadat.txt',sep=''), header = FALSE))
+}
+
+
+###Graph MetaDat
+nbreaks = length(FixVals3)
+initcols = c('purple', 'orange')#brewer.pal(, "Blues")
+cols = c('black','green','red')#colorRampPalette(initcols)(nbreaks-1)
+
+
+            FileName = paste('TPathAvg',TCrit,FixValName1, F1, FixValName2, F2,'.png',sep='')      
             png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', res = 400)
             par(mai = c(1,1,0.25,0.25))
-	    layout(mat = matrix(c(1,2),ncol = 2), widths = c(1,0.2))
-	    
-	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
-	    	    xlab = 'Time of Vaccination', ylab = 'Time of Pathogen Invasion', 
-		    xaxt = 'n', yaxt = 'n')
-	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), add = T, labcex = 1)
+	    matplot(matrix(MetaDat[1,-(1:3)], ncol=1),t(MetaDat[-1,-(1:3)]), xlim = c(8*365,9*365), ylim = c(0,1), xaxt = 'n', yaxt = 'n', 
+	    	     xlab = '', ylab = '', pch = 1, lwd = 2, cex = 1, col = cols)
 
-	    abline(v = parmat$tb[1], lwd = 3, lty = 3)
-#	    abline(b = 1, lwd = 3, lty = 1)
-	    segments(0.1, 8*365, 364.9, 9*365, lwd = 3, lty = 1)	    
+	    lines(x = XVals%%365, y = TPathAvg, col = cols[i3], lwd = 2)
 
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = T, at = seq(0,365, by = 60))
-	    axis(side = 2, labels = axislabs, at = seq(8*365,9*365, by = 60))
+	    axis(side = 1, labels = axislabs, at = seq(8*365,9*365, by = 60))
+	    axis(side = 2, labels = T, at = seq(0,1,by =0.1))
 
-	    #Build legend bar
-	    Zmat = matrix(breaks, ncol = nbreaks)
-	    ZmatCent = matrix(0.5*(Zmat[-1] + Zmat[-length(Zmat)]), ncol = nbreaks-1)
-
-            par(mai = c(1,0.05,0.25,0.6))
-	    image(x = 1, y = Zmat, z = ZmatCent, col = cols, breaks = breaks, 
-	    	    ylim = range(breaks), xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
-	    axis(side = 4, las = 1)
+	    mtext(side = 1, text = 'Time of Vaccination', line = 3)
+	    mtext(side = 2, text = 'Probability of Establishment', line = 3)
+	    abline(v = parmat$tb[1] + 8*365, lwd = 3, lty = 3)
+	    legendtext = paste('Nv = ', FixVals3, sep='')
+	    legend(x = 'bottomright', legend = legendtext, pch = 1,pt.lwd = 2, col = cols)
             dev.off()
-print(paste("Figure", i, "complete",sep = " " ))
-}else{
-print(paste("Figure", i, "fail",sep = " " ))
-}
-i=i+1
-    }}}#End Loop through fixed vals
-
-
-
 
