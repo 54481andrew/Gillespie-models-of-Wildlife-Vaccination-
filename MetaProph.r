@@ -1,6 +1,7 @@
 BuildDataFlag = FALSE
-FoldName = "Meta1"
-SimNameList = c("NewProphVacc/Data/DeerMice_Base_Freq_varNv")
+FoldName = "Meta1_Fig"
+SimType = "NewProphVacc"
+SimNameList = paste(SimType,"/Data/DeerMice_Base_Freq_varNv",sep='')
 
 #Collect all data
 #for(i in 1:length(SimNameList)){
@@ -34,7 +35,7 @@ FixVals2 = 10#unique(parmat[,FixValName2])
 FixValName3 = 'Nv'
 FixVals3 = c(100,250,500)#unique(parmat[,FixValName3])
 
-FigFold = paste(FoldName,'_Fig',sep='')
+FigFold = paste(FoldName,sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
 
 nXVals <- length(unique(parmat[,XValName]))
@@ -90,9 +91,9 @@ print(paste("Finished i3: ", i3, sep = " " ))
 
 }}#End loop through FixedVals
 
-write.matrix(MetaDat, file = paste(FigFold, '/metadat.txt',sep=''))
+write.matrix(MetaDat, file = paste(FigFold, '/', SimType,'_metadat.txt',sep=''))
 }else{
-	MetaDat = as.matrix(read.table(file = paste(FigFold, '/metadat.txt',sep=''), header = FALSE))
+	MetaDat = as.matrix(read.table(file = paste(FigFold,'/', SimType,'_metadat.txt',sep=''), header = FALSE))
 }
 
 
@@ -102,11 +103,11 @@ initcols = c('purple', 'orange')#brewer.pal(, "Blues")
 cols = c('black','green','red')#colorRampPalette(initcols)(nbreaks-1)
 
 
-            FileName = paste('TPathAvg',TCrit,FixValName1, F1, FixValName2, F2,'.png',sep='')      
+            FileName = paste('TPathAvg_',SimType, '_',FixValName1, F1, FixValName2, F2,'.png',sep='')      
             png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', res = 400)
             par(mai = c(1,1,0.25,0.25))
 	    matplot(matrix(MetaDat[1,-(1:3)], ncol=1),t(MetaDat[-1,-(1:3)]), xlim = c(8*365,9*365), ylim = c(0,1), xaxt = 'n', yaxt = 'n', 
-	    	     xlab = '', ylab = '', pch = 1, lwd = 2, cex = 1, col = cols)
+	    	     xlab = '', ylab = '', pch = 1, lwd = 2, cex = 1, col = cols, main = SimType)
 
 	    lines(x = XVals%%365, y = TPathAvg, col = cols[i3], lwd = 2)
 
