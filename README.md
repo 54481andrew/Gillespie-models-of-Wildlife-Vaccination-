@@ -4,7 +4,7 @@ fluctuating wildlife population. The three directories simulate three
 scenarios: 
 
 ******************
-*** SCENARIOS ****
+    SCENARIOS 
 ******************
 
 *NewPropVacc: the pathogen is introduced into a completely susceptible, fluctuating population. A single premptive or reactive pulse vaccination occurs. Prior to pathogen invasion, the susceptible population is simulated for 8 years to reach a stable limit cycle. Output figures depict the probability that the pathogen remains in the population, one year after vaccination.  
@@ -15,7 +15,7 @@ scenarios:
 
 
 ******************
-******  CODE  ****
+       CODE
 ******************
 
 Each directory contains c++ scripts Sim_Gillespie and Sim_Gillespie_Freq that use a modified Gillespie algorithm to simulate the scenario forward in time. The Gillespie algorithm is modified so that simulation stops for the following fixed time events: start of breeding season (birth rate set nonzero), end of breeding season (birth rate set to zero), and a pulse vaccination. 
