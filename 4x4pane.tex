@@ -13,6 +13,45 @@
 \begin{document}
 
 
+
+\section{Deterministic}
+
+\FloatBarrier
+\begin{center}Effect of host lifespan \end{center}
+\begin{figure}[!ht]
+  \includegraphics[ width = \textwidth]{Figures/St3_rho_1}
+\end{figure}
+
+\begin{center}Effect of \# vaccines per host (avg abundance)\end{center}
+\FloatBarrier
+\begin{figure}[!ht]
+  \includegraphics[ width = \textwidth]{Figures/St42_varrho}
+\end{figure}
+
+
+
+
+\begin{center}Pathogen prevalence with annual vaccination\end{center}
+\FloatBarrier
+\begin{figure}[!ht]
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  Density-dependence
+  \includegraphics[ width = \textwidth]{Figures/Path_Dens}
+\end{subfigure}
+\begin{subfigure}{0.5\textwidth}
+\centering
+Frequency-dependence
+  \includegraphics[ width = \textwidth]{Figures/Path_Freq}
+\end{subfigure}
+
+
+\end{figure}
+
+
+\newpage
+\section{Stochastic}
+
 Eradication of a pathogen circulating in the population at Quasi steady state
 \FloatBarrier
 \begin{figure}[!ht]
@@ -39,6 +78,7 @@ Frequency-dependence
 \newpage
 
 
+Pathogen invasion into a susceptible population, single preemptive/reactive pulse vaccination
 \FloatBarrier
 \begin{figure}[!ht]
 \begin{subfigure}{.5\textwidth}
@@ -66,7 +106,9 @@ Frequency-dependence
 
 \end{figure}
 
-Protection from an introduced pathogen
+\newpage
+
+Pathogen invasion into annually vaccinated population
 \FloatBarrier
 \begin{figure}[!ht]
 \begin{subfigure}{.5\textwidth}
@@ -86,6 +128,40 @@ Frequency-dependence
 \includegraphics[width = \textwidth]{{{ProphVacc/Data/DeerMice_Base_Freq_varNv_Fig/PExt_365Bp0.0187IpInit10Nv500}}}
 \end{subfigure}\\
 \end{figure}
+
+\newpage
+
+\FloatBarrier
+\begin{figure}[!ht]
+
+\begin{center}Pathogen R0 = 1.1\end{center} 
+
+\begin{subfigure}{.5\textwidth}
+\centering
+Density-dependence
+\includegraphics[ width = \textwidth]{{{MetaProph_Fig/TPathAvg_ProphVacc_Bp5e-05IpInit10}}}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\centering
+Frequency-dependence
+\includegraphics[width = \textwidth]{{{MetaProphFreq_Fig/TPathAvg_ProphVacc_Bp0.0125IpInit10}}}
+\end{subfigure} \\
+\begin{center}Pathogen R0 = 1.5\end{center}
+
+\begin{subfigure}{.5\textwidth}
+\centering
+\includegraphics[ width = \textwidth]{{{MetaProph_Fig/TPathAvg_ProphVacc_Bp7e-05IpInit10}}}
+\end{subfigure}
+\begin{subfigure}{.5\textwidth}
+\centering
+
+\includegraphics[width = \textwidth]{{{MetaProphFreq_Fig/TPathAvg_ProphVacc_Bp0.0187IpInit10}}}
+\end{subfigure} \\
+\end{figure}
+
+
+
+
 
 
 
