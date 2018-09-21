@@ -1,7 +1,8 @@
-BuildDataFlag = FALSE
-FoldName = "Meta1_Fig"
-SimType = "NewProphVacc"
-SimNameList = paste(SimType,"/Data/DeerMice_Base_Freq_varNv",sep='')
+BuildDataFlag = TRUE
+FoldName = "MetaProph_Fig"
+SimType = "ProphVacc"
+SimNameList = paste(SimType,"/Data/DeerMice_Base_varNv_redo",sep='')
+#SimNameList = paste(SimType,"/Data/DeerMice_Base_Freq_varNv",sep='')
 
 #Collect all data
 #for(i in 1:length(SimNameList)){
@@ -106,20 +107,28 @@ cols = c('black','green','red')#colorRampPalette(initcols)(nbreaks-1)
             FileName = paste('TPathAvg_',SimType, '_',FixValName1, F1, FixValName2, F2,'.png',sep='')      
             png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', res = 400)
             par(mai = c(1,1,0.25,0.25))
-	    matplot(matrix(MetaDat[1,-(1:3)], ncol=1),t(MetaDat[-1,-(1:3)]), xlim = c(8*365,9*365), ylim = c(0,1), xaxt = 'n', yaxt = 'n', 
+	    
+	    if(SimType=="ProphVacc"){xrange <- c(0,365)}else{xrange <- c(8*365, 9*365)}
+
+	    matplot(matrix(MetaDat[1,-(1:3)], ncol=1),t(MetaDat[-1,-(1:3)]), xlim = xrange, ylim = c(0,1), xaxt = 'n', yaxt = 'n', 
 	    	     xlab = '', ylab = '', pch = 1, lwd = 2, cex = 1, col = cols, main = SimType)
 
-	    lines(x = XVals%%365, y = TPathAvg, col = cols[i3], lwd = 2)
+#	    lines(x = XVals%%365, y = TPathAvg, col = cols[i3], lwd = 2)
 
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
-	    axis(side = 1, labels = axislabs, at = seq(8*365,9*365, by = 60))
+	    if(SimType=="ProphVacc"){axlabs = seq(0,365, by = 60)}else{axlabs = seq(8*365, 9*365, by = 60)}
+	    axis(side = 1, labels = axislabs, at = axlabs)
+
 	    axis(side = 2, labels = T, at = seq(0,1,by =0.1))
 
 	    mtext(side = 1, text = 'Time of Vaccination', line = 3)
 	    mtext(side = 2, text = 'Probability of Establishment', line = 3)
 	    abline(v = parmat$tb[1] + 8*365, lwd = 3, lty = 3)
-	    legendtext = paste('Nv = ', FixVals3, sep='')
+	    #legendtext = paste('Nv = ', FixVals3, sep='')
+	    legendtext = sapply(round(FixVals3/(parmat$NAvg[1]),1), function(x) as.expression(substitute(rho == B,
+                    list(B = as.name(x)))))
+	    #legendtext = expression(bquote(rho ~ '= ' ~ .(FixVals3[1]/(parmat$NAvg[1]))))
 	    legend(x = 'bottomright', legend = legendtext, pch = 1,pt.lwd = 2, col = cols)
             dev.off()
 
