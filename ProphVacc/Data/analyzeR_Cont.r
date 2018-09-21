@@ -60,7 +60,7 @@ for(i1 in 1:nFixVals1){
             }
 	}
 zmin = 0#floor(10*min(PExtMat))/10
-zmax = 0.2
+zmax = 1
 breaks = seq(zmin,zmax,by = 0.01)
 nbreaks = length(breaks)
 initcols = c('purple', 'orange')#brewer.pal(, "Blues")

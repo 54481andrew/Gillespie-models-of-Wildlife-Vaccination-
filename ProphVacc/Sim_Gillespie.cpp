@@ -23,16 +23,16 @@ of a zoonotic pathogen.
 //CONSTANTS
 //***********
 const int NTrials = 1000;
-const int TPathLEN = 1;
-const int IpInitLEN = 1; int ipinitvals[]={10};
+const int TPathLEN = 26;
+const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
 const int tvLEN = 26; 
-const int BpLEN = 1; double bpvals[] = {0.00005,0.00007};
-const int NvLEN = 1; double nvvals[] = {450.0};
+const int BpLEN = 2; double bpvals[] = {0.00005,0.00007};
+const int NvLEN = 11; double nvvals[] = {450.0};
 
-const int NParSets = 1;
+const int NParSets = 44616;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
@@ -45,7 +45,7 @@ std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
 
 //TMax is the time beyond pathogen introduction that should be simulated
-double TMax = 2.1*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 1.1*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
