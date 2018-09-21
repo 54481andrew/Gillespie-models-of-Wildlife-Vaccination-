@@ -1,4 +1,3 @@
-
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
@@ -24,16 +23,16 @@ of a zoonotic pathogen.
 //CONSTANTS
 //***********
 const int NTrials = 1000;
-const int TPathLEN = 26;
-const int IpInitLEN = 3; int ipinitvals[]={1,5,10};
+const int TPathLEN = 1;
+const int IpInitLEN = 1; int ipinitvals[]={10};
 const int tvLEN = 26; 
-const int BpLEN = 2; double bpvals[] = {0.00005, 0.00007};
-const int NvLEN = 11; double nvvals[] = {450.0};
+const int BpLEN = 1; double bpvals[] = {0.00005,0.00007};
+const int NvLEN = 1; double nvvals[] = {450.0};
 
-const int NParSets = 44616;
+const int NParSets = 1;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
@@ -46,7 +45,7 @@ std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
 
 //TMax is the time beyond pathogen introduction that should be simulated
-double TMax = 1.1*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 2.1*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
@@ -116,6 +115,7 @@ int main()
     {
       if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
+	strcpy(FileNameDat, DirName);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death svacc npopvacc totvacc totbirthson totbirthsoff\n";
@@ -197,13 +197,13 @@ void ApplyEvent() {
       else{P--; P_death++;}  //P dies	
       NPop--; ndeaths++;
     }  
-  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S/NPop)    //Event: Pathogen infection of S
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S)    //Event: Pathogen infection of S
     {S--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop) //Event: Pathogen infection of V
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv) //Event: Pathogen infection of V
     {Iv--; Ip++; ninfp++;}
-  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv) //Event: Iv Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv) //Event: Iv Recovery
     {Iv--;V++;nrecv++;}
-  else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip) //Event: Ip Recovery
+  else if(Event_Rate_Prod <= b + d*NPop + Bp*Ip*S + Bp*Ip*Iv + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {Ip--; P++; nrecp++;}
 }
 

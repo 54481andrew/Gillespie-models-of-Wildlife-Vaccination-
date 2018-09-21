@@ -119,6 +119,7 @@ int main()
     {
       if(VerboseWriteFlag){
 	sprintf(FileSuffix, "Par_%d",Par);
+	strcpy(FileNameDat, DirName);
 	strcat(FileNameDat, FileSuffix);
 	out_data.open(FileNameDat);
 	out_data << "time S Iv Ip V P N births deaths ninfv ninfp nrecv nrecp S_death Iv_death Ip_death V_death P_death svacc npopvacc totvacc totbirthson totbirthsoff\n";

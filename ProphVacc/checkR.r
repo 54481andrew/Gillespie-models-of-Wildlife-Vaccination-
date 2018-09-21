@@ -77,12 +77,12 @@ for(i in 1:length(parmat$NPar)){
     lines(V~time, out, col = 'blue', lty = 1, lwd = 4)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 4)
     
-    these <- seq(1,nrow(dat), by = 100)
+    these <- seq(1,nrow(dat), by = 1000)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
-    points(V~time, dat[these,], col = 'blue', cex = 0.25, pch = 1)
-    points(P~time, dat[these,], col = 'pink', cex = 0.25, pch = 1)
+    #points(V~time, dat[these,], col = 'blue', cex = 0.25, pch = 1)
+    #points(P~time, dat[these,], col = 'pink', cex = 0.25, pch = 1)
 
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)
