@@ -18,6 +18,6 @@ scenarios:
        CODE
 ******************
 
-Each directory contains c++ scripts Sim_Gillespie and Sim_Gillespie_Freq that use a modified Gillespie algorithm to simulate the scenario forward in time. The Gillespie algorithm is modified so that simulation stops for the following fixed time events: start of breeding season (birth rate set nonzero), end of breeding season (birth rate set to zero), and a pulse vaccination. 
+Each directory contains c++ scripts Sim_Gillespie and Sim_Gillespie_Freq that use a modified Gillespie algorithm to simulate the scenario forward in time. The scripts model density dependent and frequency dependent transmission, respectively. In both scripts, the Gillespie algorithm is modified so that simulation stops for the following fixed time events: start of breeding season (birth rate set nonzero), end of breeding season (birth rate set to zero), and a pulse vaccination. 
 
 In addition, each directory contains a Data directory with R graphing scripts. The graphing scripts plot 2 types of figures: the first shows the probability that the pathogen remains in the population for a fixed time; the 2nd type of figure is a line graph of the same probability, averaged over all of the possible times of pathogen invasion throughout a year. 
