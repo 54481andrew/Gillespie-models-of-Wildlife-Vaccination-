@@ -1,6 +1,4 @@
-This repository contains two directories, ProphVacc and EradVacc, that
-contain code to simulate a vaccination campaign applied to a
-fluctuating wildlife population. The three directories simulate three 
+This repository contains three directories, NewProphVacc, ProphVacc and EradVacc, that each contain code to simulate a vaccination campaign applied to a fluctuating wildlife population. The three directories simulate three 
 scenarios: 
 
 ******************
