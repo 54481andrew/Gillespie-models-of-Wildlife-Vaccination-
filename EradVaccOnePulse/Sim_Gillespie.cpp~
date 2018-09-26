@@ -6,6 +6,9 @@ model. The simulation procedes according
 to the Gillespie algorithm, and simulates 
 the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
+EradVaccOnePulse models a single pulse 
+vaccination. 
+
 */
 
 #include <iostream> // input/output std::cout, cin
@@ -46,7 +49,7 @@ std::vector<double> BpVals;
 std::vector<double> NvVals;
 std::vector<int> IpInitVals; 
 
-double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
@@ -143,9 +146,13 @@ int main()
 	  Nv = 0.0; //No vaccination at first
 	  OneSim(0.0, TVaccStart, false);
 
-	  //Simulate invasion until TMax years, or pathogen extinction
-	  Nv = ParMat[Par][4]; //Nv 
-	  OneSim(TVaccStart, TMax, true);
+	  //Simulate vaccination at time TVaccStart
+	  Nv = ParMat[Par][4]; //set Nv
+	  VaccFun(); //Vaccinate once
+	  Nv = 0.0;  //Turn off vaccination 
+		
+	  //Continue sim for TMax
+	  OneSim(TVaccStart, TVaccStart+TMax, true);
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
@@ -250,7 +257,7 @@ void Initialize()
 	    {
 	      ParMat[i][0] = i; //Par
 	      ParMat[i][1] = 4.0;   //b0
-	      ParMat[i][2] = 0.004; //d
+	      ParMat[i][2] = 0.002; //d
 	      ParMat[i][3] = BpVals[i2]; //Bp
 	      ParMat[i][4] = NvVals[i5]; //Nv
 	      ParMat[i][5] = tvVals[i1]; //tv

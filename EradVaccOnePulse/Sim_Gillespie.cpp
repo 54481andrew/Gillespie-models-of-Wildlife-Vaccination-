@@ -8,7 +8,6 @@ the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
 EradVaccOnePulse models a single pulse 
 vaccination. 
-
 */
 
 #include <iostream> // input/output std::cout, cin
@@ -23,16 +22,17 @@ vaccination.
 
 //---------------------------------------------------------START HEADER FILE
 
-//********
+//**********
 //CONSTANTS
-//********
+//**********
 const int NTrials = 1000;
-const int TVaccLEN = 1;
+const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 52;
-const int BpLEN = 3; double bpvals[] = {0.00003,0.00005,0.00007};
-const int NvLEN = 52;
-const int NParSets = 8112;
+const int tvLEN = 26;
+const int tbLEN = 2;
+const int BpLEN = 26; //double bpvals[] = {0.0000213, 0.0000284, 0.00005, 0.0000568};
+const int NvLEN = 3;
+const int NParSets = 4056;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -55,6 +55,7 @@ int SInit = 1000;
 
 //********
 //ARRAYS
+//********
 double ParMat [NParSets][NumPars];
 double TExtMat [NParSets][NTrials];
 
@@ -241,12 +242,14 @@ void GetTime (){
 void Initialize()
 {
   tvVals = Seq(0.1, 364.9, tvLEN);
+  tbVals.assign(tbvals, tbvals + tbLEN);
+
   TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
-  BpVals.assign(bpvals, bpvals + BpLEN);
-  //BpVals = Seq(0.00001,0.0001,BpLEN);
+  //BpVals.assign(bpvals, bpvals + BpLEN);
+  BpVals = Seq(0.0000213,0.0000568,BpLEN);
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1.0,500.0,NvLEN);
-  
+  //NvVals = Seq(1.0,500.0,NvLEN);
+  NvVals.assign(nvvals,nvvals+NvLEN);  
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
@@ -254,6 +257,7 @@ void Initialize()
       for(int i3=0; i3<TVaccStartVals.size(); i3++)
 	for(int i4=0; i4<IpInitVals.size(); i4++)
 	  for(int i5=0; i5<NvVals.size(); i5++)
+	    for(int i6=0; i6<tbVals.size(); i6++)
 	    {
 	      ParMat[i][0] = i; //Par
 	      ParMat[i][1] = 4.0;   //b0
@@ -262,8 +266,8 @@ void Initialize()
 	      ParMat[i][4] = NvVals[i5]; //Nv
 	      ParMat[i][5] = tvVals[i1]; //tv
 	      ParMat[i][6] = 0.07; //gamv
-	      ParMat[i][7] = 0.007; //gamp
-	      ParMat[i][8] = 90.0; //tb
+	      ParMat[i][7] = 0.005; //gamp
+	      ParMat[i][8] = tbVals[i6]; //tb
 	      ParMat[i][9] = 365.0; //T
 	      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 	      ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
