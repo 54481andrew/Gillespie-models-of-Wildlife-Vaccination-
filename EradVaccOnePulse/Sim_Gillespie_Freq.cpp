@@ -33,8 +33,9 @@ const int tbLEN = 2; double tbvals[] = {45.0,90.0};
 const int BpLEN = 26; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
+const int gampLEN = 2; double gampvals[] = {0.005, 0.033};
 
-const int NParSets = 8112;
+const int NParSets = 16224;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -52,6 +53,7 @@ std::vector<double> NvVals;
 std::vector<double> RhoVals;
 std::vector<int> IpInitVals; 
 std::vector<int> tbVals;
+std::vector<int> gampVals;
 
 double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -266,21 +268,22 @@ void Initialize()
 	for(int i4=0; i4<IpInitVals.size(); i4++)
 	  for(int i5=0; i5<RhoVals.size(); i5++) //Note RhoVals
 	    for(int i6=0; i6<tbVals.size(); i6++)
-	      {
-		ParMat[i][0] = i; //Par
-		ParMat[i][1] = 4.0;   //b0
-		ParMat[i][2] = 0.002; //d
-		ParMat[i][3] = R0pVals[i2]*(0.002 + 0.005); //Bp
-		ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*0.002); //Nv
-		ParMat[i][5] = tvVals[i1]; //tv
-		ParMat[i][6] = 0.07; //gamv
-		ParMat[i][7] = 0.005; //gamp
-		ParMat[i][8] = tbVals[i6]; //tb
-		ParMat[i][9] = 365.0; //T
-		ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-		ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
-		i++;
-	      }
+	      for(int i7=0; i7<gampVals.size(); i7++)
+		{
+		  ParMat[i][0] = i; //Par
+		  ParMat[i][1] = 4.0;   //b0
+		  ParMat[i][2] = 0.002; //d
+		  ParMat[i][3] = R0pVals[i2]*(0.002 + 0.005); //Bp
+		  ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*0.002); //Nv
+		  ParMat[i][5] = tvVals[i1]; //tv
+		  ParMat[i][6] = 0.07; //gamv
+		  ParMat[i][7] = gampVals[i7]; //gamp
+		  ParMat[i][8] = tbVals[i6]; //tb
+		  ParMat[i][9] = 365.0; //T
+		  ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
+		  ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
+		  i++;
+		}
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)

@@ -1,4 +1,4 @@
-SimName = "Freq_DeerMice_Base"
+SimName = "DeerMice_Base"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
@@ -85,7 +85,7 @@ if(zmin < zmax){
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
 		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
 	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), 
-	    	      add = T)
+	    	      add = T, labcex = 1)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = axislabs)

@@ -1,8 +1,17 @@
 SimName = "DeerMice_Base"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
-parmat$R0approx = with(parmat, Bp*(b0*tb)/(T*d*(d+gamp)))
-parmat$R0star = with(parmat, R0approx*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
+
+if(grepl('Freq',SimName)){
+	parmat$R0p = with(parmat, round( Bp/(d+gamp) ,2))
+}else{
+	parmat$R0p = with(parmat, round( Bp*(b0*tb)/(T*d*(d+gamp)) ,2))
+}
+
+
+parmat$R0approx = with(parmat, R0p*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
+parmat$rho = with(parmat, round(Nv/(b0*tb/(d*T)),2))
+
 NPars = nrow(parmat)
 NTrials = 1000
 VaccStartTime = 8*365 #Time at which vaccination is started
@@ -18,14 +27,14 @@ TExtMat = read.table(TExtMatFile, header = FALSE)
 ##X-axis: tv;
 XValName = 'tv'
 XVals = unique(parmat[,XValName])
-YValName = 'Nv'
+YValName = 'R0p'
 YVals = unique(parmat[,YValName])
-FixValName1 = 'Bp'
+FixValName1 = 'rho'
 FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
-FixValName2 = 'b0'
+FixValName2 = 'tb'
 FixVals2 = unique(parmat[,FixValName2])
 FixValName3 = 'd'
-FixVals3 = 0.004
+FixVals3 = unique(parmat[,FixValName3])
 
 FigFold = paste(SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
@@ -58,7 +67,7 @@ for(i1 in 1:nFixVals1){
 		#Which trials had pathogen until time VaccStartTime
 		wiTrialsToVacc = which(TExtMat[wifix,] > (VaccStartTime + XVal))
 		NTrialsToVacc = length(wiTrialsToVacc)
-                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] > 
+                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] <  
 			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
 	    }}#End loops through XVals and YVals
 
@@ -72,8 +81,8 @@ cols = colorRampPalette(initcols)(nbreaks-1)
 axistext <- function(GraphMe){
 	switch(GraphMe, 
 	'Nv' = 'Number Vaccines', 
-	'tv' = 'Time of Vaccination')   
-}
+	'tv' = 'Time of Vaccination',
+	'rho' = 'Scaled Number Vaccines')}
 
 if(zmin < zmax){
             FileName = paste('PExt_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='') 
@@ -83,17 +92,17 @@ if(zmin < zmax){
 	    layout(mat = matrix(c(1,2),ncol = 2), widths = c(1,0.2))
 	    
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
-		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '')
+		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', ylim = c(1,2))
 	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), 
 	    	      add = T, labcex = 1)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = axislabs)
-	    axis(side = 2, labels = T, at = seq(0,5000,length.out = 21))
+	    axis(side = 2, labels = T)
 	    mtext(text = axistext(XValName),side = 1, line = 3)
 	    mtext(text = axistext(YValName),side = 2, line = 3)
 
-	    abline(v = parmat$tb[1], lwd = 3, lty = 3)
+	    abline(v = parmat$tb[wifix], lwd = 3, lty = 3)
 
 	    #Build legend bar
 	    Zmat = matrix(breaks, ncol = nbreaks)
