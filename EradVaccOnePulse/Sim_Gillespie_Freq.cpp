@@ -30,19 +30,19 @@ const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
 const int tbLEN = 2; double tbvals[] = {45.0,90.0};
-const int BpLEN = 26; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
+const int BpLEN = 52; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
-const int gampLEN = 2; double gampvals[] = {0.005, 0.033};
+const int gampLEN = 3; double gampvals[] = {0.005,0.017,0.033};
 
-const int NParSets = 16224;
+const int NParSets = 48672;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_Freq";
+char SimName[50] = "DeerMice_Base_Freq_1";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
@@ -52,8 +52,8 @@ std::vector<double> R0pVals;
 std::vector<double> NvVals;
 std::vector<double> RhoVals;
 std::vector<int> IpInitVals; 
-std::vector<int> tbVals;
-std::vector<int> gampVals;
+std::vector<double> tbVals;
+std::vector<double> gampVals;
 
 double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -150,7 +150,7 @@ int main()
 	  
 	  //Simulate to quasi steady state (rewrites State)
 	  Nv = 0.0; //No vaccination at first
-	  OneSim(0.0, TVaccStart, false);
+	  OneSim(0.0, TVaccStart + tv, false);
 
 	  //Simulate vaccination at time TVaccStart
 	  Nv = ParMat[Par][4]; //set Nv
@@ -158,7 +158,7 @@ int main()
 	  Nv = 0.0;  //Turn off vaccination 
 		
 	  //Continue sim for TMax
-	  OneSim(TVaccStart, TVaccStart+TMax, true);
+	  OneSim(TVaccStart+tv, TVaccStart+TMax, true);
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;	      
@@ -252,13 +252,15 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0105,0.028,BpLEN);
-  R0pVals = Seq(1.1, 5.0, BpLEN);
+  R0pVals = Seq(1.01, 5.0, BpLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
   //NvVals = Seq(1.0,500.0,NvLEN);
   //NvVals.assign(nvvals,nvvals+NvLEN);
   RhoVals.assign(rhovals, rhovals + RhoLEN);
+
+  gampVals.assign(gampvals, gampvals + gampLEN);
 
   //Fill in ParMat
   int i = 0;
@@ -273,7 +275,7 @@ void Initialize()
 		  ParMat[i][0] = i; //Par
 		  ParMat[i][1] = 4.0;   //b0
 		  ParMat[i][2] = 0.002; //d
-		  ParMat[i][3] = R0pVals[i2]*(0.002 + 0.005); //Bp
+		  ParMat[i][3] = R0pVals[i2]*(0.002 + gampVals[i7]); //Bp
 		  ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*0.002); //Nv
 		  ParMat[i][5] = tvVals[i1]; //tv
 		  ParMat[i][6] = 0.07; //gamv
