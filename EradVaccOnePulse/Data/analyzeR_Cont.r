@@ -1,4 +1,4 @@
-SimName = "DeerMice_Base_Freq_1"
+SimName = "Test"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 
@@ -49,8 +49,6 @@ TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st
 
 require(RColorBrewer)
 
-
-
 i = 1
 for(i1 in 1:nFixVals1){
     for(i2 in 1:nFixVals2){
@@ -95,8 +93,8 @@ if(zmin < zmax){
 	    
 	    image(x = XVals, y = YVals, z = PExtMat, col = cols, breaks = breaks, 
 		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', ylim = c(1,2))
-	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), 
-	    	      add = T, labcex = 1)
+#	    contour(x = XVals, y = YVals, z = PExtMat, levels = seq(0,1,by = 0.1), 
+#	    	      add = T, labcex = 1)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
 	    axis(side = 1, labels = T, at = axislabs)

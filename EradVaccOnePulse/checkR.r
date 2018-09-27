@@ -1,5 +1,5 @@
-SimName = "Freq_DeerMice_Base";
-parmat = read.table(file = paste("Data/ParMat_", SimName, sep=''), header = F)
+SimName = "Test"
+parmat = read.table(file = paste("Data/",SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TVaccStart')
 
 require(deSolve)
@@ -9,10 +9,10 @@ times = seq(0,10000)
 
 maxtimes <- 365*11
 timeseq  <- seq(0,maxtimes, by = 0.01)
-NPars = 2#length(parmat$Par)
+NPars = 5#length(parmat$Par)
 
 
-for(i in 1:NPars){
+for(i in c(14, 50)){
 
 y0 = c(1000, 0, 100, 0, 0)
 names(y0) = c('S','Iv','Ip','V','P')
@@ -22,7 +22,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     parmat$Nv[i] <- 0 #temporarily set to 0
 
     tv <- parmat$tv[i]
-    vacctimes <- seq(tv, maxtimes,by = VaccPer)
+    vacctimes <- 8*365 + tv
    
     print(paste("NPar:", i-1))
     filename = paste("Data/", SimName, "/Par_", i-1, sep = '')
@@ -54,7 +54,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
@@ -79,7 +79,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
@@ -106,7 +106,7 @@ names(y0) = c('S','Iv','Ip','V','P')
 #    lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
 #    lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
