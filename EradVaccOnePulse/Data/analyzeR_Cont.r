@@ -67,7 +67,7 @@ for(i1 in 1:nFixVals1){
 		      parmat[,FixValName2]==F2 & parmat[,FixValName3]==F3 
 
 		#Which trials had pathogen until time VaccStartTime
-		wiTrialsToVacc = which(TExtMat[wifix,] > (VaccStartTime + XVal))
+		wiTrialsToVacc = which(TExtMat[wifix,] > round(VaccStartTime + XVal,2))
 		NTrialsToVacc = length(wiTrialsToVacc)
                 PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] <  
 			       (VaccStartTime + XVal + TCrit))/max(NTrialsToVacc,1)

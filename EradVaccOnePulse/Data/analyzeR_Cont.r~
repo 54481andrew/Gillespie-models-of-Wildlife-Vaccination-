@@ -1,4 +1,4 @@
-SimName = "DeerMice_Base"
+SimName = "DeerMice_Base_Freq_1"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 
@@ -33,7 +33,7 @@ FixValName1 = 'rho'
 FixVals1 = unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'tb'
 FixVals2 = unique(parmat[,FixValName2])
-FixValName3 = 'd'
+FixValName3 = 'gamp'
 FixVals3 = unique(parmat[,FixValName3])
 
 FigFold = paste(SimName,'_Fig',sep='')
@@ -48,6 +48,8 @@ nFixVals3 <- length(FixVals3)
 TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 
 require(RColorBrewer)
+
+
 
 i = 1
 for(i1 in 1:nFixVals1){
@@ -68,7 +70,7 @@ for(i1 in 1:nFixVals1){
 		wiTrialsToVacc = which(TExtMat[wifix,] > (VaccStartTime + XVal))
 		NTrialsToVacc = length(wiTrialsToVacc)
                 PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] <  
-			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+			       (VaccStartTime + XVal + TCrit))/max(NTrialsToVacc,1)
 	    }}#End loops through XVals and YVals
 
 zmin = floor(10*min(PExtMat[!is.na(PExtMat)]))/10
