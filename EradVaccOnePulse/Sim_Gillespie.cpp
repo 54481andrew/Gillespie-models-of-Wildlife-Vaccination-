@@ -25,27 +25,27 @@ vaccination.
 //**********
 //CONSTANTS
 //**********
-const int NTrials = 100;
+const int NTrials = 10000;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
 const int tbLEN = 1; double tbvals[] = {90.0};
-const int BpLEN = 3; double bpvals[] = {0.00005};
+const int BpLEN = 1; double bpvals[] = {0.00005};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 1; double rhovals[] = {5.0};
+const int RhoLEN = 1; double rhovals[] = {1.0};
 const int gampLEN = 1; double gampvals[] = {0.005};
 
-const int NParSets = 156;
+const int NParSets = 52;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = true;
+const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
 char SimName[50] = "Test";
 
 std::vector<double> tvVals;
-double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
+double TVaccMIN = 8.0*365.0; double TVaccMAX = 9.0*365.0; 
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals;
 std::vector<double> R0pVals; 
@@ -97,8 +97,8 @@ void WriteMat(double *arr, int NRow, int NCol, char* filename);
 //MAIN
 int main()
 {
-  srand ( time(NULL) );
-
+  //srand ( time(NULL) );
+  srand(42);
   //Build directory for simulation results
   strcat(DirName, SimName);  
   mkdir(DirName, ACCESSPERMS);
@@ -115,7 +115,7 @@ int main()
 
   WriteMat((double *)ParMat, NParSets, NumPars, FileNamePar); //Write ParMat
 
-  for(int Par = 0; Par < NParSets; Par++) //Loop through parameters
+  for(int Par = 0; Par < 25; Par++) //Loop through parameters
     {
       if(VerboseWriteFlag){
 	strcpy(FileNameDat, DirName);
@@ -152,13 +152,13 @@ int main()
 	  Nv = 0.0; //No vaccination at first
 	  OneSim(0.0, TVaccStart+tv, false);
 
-	  //Simulate vaccination at time TVaccStart
+	  //Simulate vaccination at time TVaccStart + tv
 	  Nv = ParMat[Par][4]; //set Nv
 	  VaccFun(); //Vaccinate once
 	  Nv = 0.0;  //Turn off vaccination 
 		
 	  //Continue sim for TMax
-	  OneSim(TVaccStart+tv, TVaccStart+TMax, true);
+	  OneSim(TVaccStart+tv+Nudge, TVaccStart+TMax, true);
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;
@@ -252,7 +252,7 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0000213,0.0000568,BpLEN);
-  R0pVals = Seq(1.1, 1.5, BpLEN);
+  R0pVals = Seq(1.3, 1.5, BpLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
