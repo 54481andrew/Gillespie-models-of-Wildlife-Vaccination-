@@ -11,7 +11,7 @@ maxtimes <- 365*11
 timeseq  <- seq(0,maxtimes, by = 0.01)
 NPars = 5#length(parmat$Par)
 
-for(i in c(1:25)){
+for(i in c(41)){
 
 y0 = c(1000, 0, 100, 0, 0)
 names(y0) = c('S','Iv','Ip','V','P')
@@ -53,13 +53,13 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
 #    points(V~time, dat[these,], col = 'blue', cex = 0.25, pch = 1)
 #    points(P~time, dat[these,], col = 'pink', cex = 0.25, pch = 1)
-    lines(S~time, out, type = 'l', lwd = 1, col = 'white')
+    lines(S~time, out, type = 'l', lwd = 1, col = 'black')
     lines(Ip~time, out, col = 'black', lty = 1, lwd = 1)
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)
@@ -79,7 +79,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
@@ -100,20 +100,20 @@ names(y0) = c('S','Iv','Ip','V','P')
     #Tiny Picture
     pdf(file = paste(filename, "_tiny.pdf",sep = ""), height = 4, width = 6)
     par(mai = c(1,1,0.1,0.1))
-    plot(S~time, out, xlim = c(0,maxtimes), ylim = c(0,400), type = 'l', lwd = 1)
+    plot(S~time, out, xlim = c(0,maxtimes), ylim = c(0,10), type = 'l', lwd = 1)
     lines(Iv~time, out, col = 'green', lty = 1, lwd = 1)
 
 #    lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
 #    lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = 100)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
 #    points(V~time, dat[these,], col = 'blue', cex = 0.25, pch = 1)
 #    points(P~time, dat[these,], col = 'pink', cex = 0.25, pch = 1)
 
-    lines(Ip~time, out, col = 'black', lty = 1, lwd = 1)
+    lines(Ip~time, out, col = 'orange', lty = 1, lwd = 1)
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)
     

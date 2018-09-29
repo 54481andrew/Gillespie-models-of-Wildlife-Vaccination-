@@ -1,8 +1,9 @@
 SimName = "Test"
+FFlag = TRUE #Frequency
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 
-if(grepl('Freq',SimName)){
+if(grepl('Freq',SimName) || FFlag){
 	parmat$R0p = with(parmat, round( Bp/(d+gamp) ,2))
 }else{
 	parmat$R0p = with(parmat, round( Bp*(b0*tb)/(T*d*(d+gamp)) ,2))
@@ -19,7 +20,7 @@ VaccStartTime = 8*365 #Time at which vaccination is started
 TExtMatFile = paste(SimName,'/TExtMat', sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
 
-
+if(1==0){
 bins = seq(0*365-1, 11*365, by = 365/10)
 for(i in c(0,1,2,3)){
 name <- paste('par',i-1,sep='')
@@ -28,24 +29,25 @@ hist(unlist(TExtMat[i,]) - 8*365 - parmat$tv[i], main = name,
 			 freq = F, xlim = c(0,500), ylim = c(0,0.05), breaks = bins)
 dev.off()
 }
+}#End if
 
 if(1==0){
 name <- 'qq'
 png(file = paste(name,'.png',sep=''))
-plot(NA, xlim = c(0,0.6), ylim = c(0,1000))
+plot(NA, xlim = c(0,1), ylim = c(0,1000))
 xseq <- seq(2000, 5000, by = 1)
 pseq <- seq(0,1,by = 0.01)
-for(i in 0:10){
+for(i in c(40)){
 		wiTrialsToVacc = which(TExtMat[i+1,] > round((VaccStartTime + XVals[[i+1]]),2)  )
 		NTrialsToVacc = length(wiTrialsToVacc)
-
       vals <- TExtMat[i+1,wiTrialsToVacc] - 8*365 - XVals[i+1]
-#print(vals)
+      #print(vals)
 	qfxn =  quantile(vals, probs = pseq)
-	points(pseq, qfxn, pch = paste(i), lwd = 2)
+	#points(pseq, qfxn, pch = paste(i), lwd = 2)
+	text(pseq,qfxn,labels = c(paste(i)))
 	}
 dev.off()
-}
+}#End if
 
 #####################################
 ######## EXTINCTION PLOT C ##########
@@ -72,10 +74,11 @@ nFixVals1 <- length(FixVals1)
 nFixVals2 <- length(FixVals2)
 nFixVals3 <- length(FixVals3)
 
-TCrit <- 365*1.5 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
+TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 
 require(RColorBrewer)
 
+NTrials <- c()
 i = 1
 for(i1 in 1:nFixVals1){
     for(i2 in 1:nFixVals2){
@@ -94,7 +97,9 @@ for(i1 in 1:nFixVals1){
 		#Which trials had pathogen until time VaccStartTime
 		wiTrialsToVacc = which(TExtMat[wifix,] > round(VaccStartTime + XVal,2))
 		NTrialsToVacc = length(wiTrialsToVacc)
-                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] < (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] < 
+			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+		NTrials <- c(NTrials, NTrialsToVacc)
 		print(NTrialsToVacc)
 	    }}#End loops through XVals and YVals
 

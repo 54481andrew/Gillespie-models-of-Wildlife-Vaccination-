@@ -20,6 +20,33 @@ TExtMatFile = paste(SimName,'/TExtMat', sep = '')
 TExtMat = read.table(TExtMatFile, header = FALSE)
 
 
+bins = seq(0*365-1, 11*365, by = 365/10)
+for(i in c(0,1,2,3)){
+name <- paste('par',i-1,sep='')
+png(file = paste(name,'.png',sep=''))
+hist(unlist(TExtMat[i,]) - 8*365 - parmat$tv[i], main = name, 
+			 freq = F, xlim = c(0,500), ylim = c(0,0.05), breaks = bins)
+dev.off()
+}
+
+if(1==0){
+name <- 'qq'
+png(file = paste(name,'.png',sep=''))
+plot(NA, xlim = c(0,0.6), ylim = c(0,1000))
+xseq <- seq(2000, 5000, by = 1)
+pseq <- seq(0,1,by = 0.01)
+for(i in 0:10){
+		wiTrialsToVacc = which(TExtMat[i+1,] > round((VaccStartTime + XVals[[i+1]]),2)  )
+		NTrialsToVacc = length(wiTrialsToVacc)
+
+      vals <- TExtMat[i+1,wiTrialsToVacc] - 8*365 - XVals[i+1]
+#print(vals)
+	qfxn =  quantile(vals, probs = pseq)
+	points(pseq, qfxn, pch = paste(i), lwd = 2)
+	}
+dev.off()
+}
+
 #####################################
 ######## EXTINCTION PLOT C ##########
 #####################################
@@ -45,7 +72,7 @@ nFixVals1 <- length(FixVals1)
 nFixVals2 <- length(FixVals2)
 nFixVals3 <- length(FixVals3)
 
-TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
+TCrit <- 365*1.5 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 
 require(RColorBrewer)
 
@@ -65,13 +92,13 @@ for(i1 in 1:nFixVals1){
 		      parmat[,FixValName2]==F2 & parmat[,FixValName3]==F3 
 
 		#Which trials had pathogen until time VaccStartTime
-		wiTrialsToVacc = which(TExtMat[wifix,] > (VaccStartTime + XVal))
+		wiTrialsToVacc = which(TExtMat[wifix,] > round(VaccStartTime + XVal,2))
 		NTrialsToVacc = length(wiTrialsToVacc)
-                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] <  
-			       (VaccStartTime + XVal + TCrit))/max(NTrialsToVacc,1)
+                PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] < (VaccStartTime + XVal + TCrit))/NTrialsToVacc
+		print(NTrialsToVacc)
 	    }}#End loops through XVals and YVals
 
-zmin = floor(10*min(PExtMat[!is.na(PExtMat)]))/10
+zmin = 0 #floor(10*min(PExtMat[!is.na(PExtMat)]))/10
 zmax = 1
 breaks = seq(zmin,zmax,by = 0.05)
 nbreaks = length(breaks)

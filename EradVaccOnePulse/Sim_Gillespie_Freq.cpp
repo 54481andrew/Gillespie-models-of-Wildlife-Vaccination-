@@ -25,24 +25,24 @@ vaccination.
 //**********
 //CONSTANTS
 //**********
-const int NTrials = 1000;
+const int NTrials = 100;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
-const int tbLEN = 2; double tbvals[] = {45.0,90.0};
-const int BpLEN = 52; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
+const int tbLEN = 1; double tbvals[] = {45.0};
+const int BpLEN = 1; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
-const int gampLEN = 3; double gampvals[] = {0.005,0.017,0.033};
+const int RhoLEN = 1; double rhovals[] = {1.5};
+const int gampLEN = 1; double gampvals[] = {0.017};
 
-const int NParSets = 48672;
+const int NParSets = 52;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_Freq_1";
+char SimName[50] = "Test";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
@@ -97,7 +97,7 @@ void WriteMat(double *arr, int NRow, int NCol, char* filename);
 //MAIN
 int main()
 {
-  srand( time(NULL) );
+  srand(42);
 
   //Build directory for simulation results
   strcat(DirName, SimName);  
@@ -158,7 +158,7 @@ int main()
 	  Nv = 0.0;  //Turn off vaccination 
 		
 	  //Continue sim for TMax
-	  OneSim(TVaccStart+tv, TVaccStart+TMax, true);
+	  OneSim(TVaccStart + tv, TVaccStart+TMax, true);
 	  
 	  //Store final value of t in TExtMat
 	  TExtMat[Par][ntrial] = t;	      
@@ -252,7 +252,7 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0105,0.028,BpLEN);
-  R0pVals = Seq(1.01, 5.0, BpLEN);
+  R0pVals = Seq(4.0, 5.0, BpLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
