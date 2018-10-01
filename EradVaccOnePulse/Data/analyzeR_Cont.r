@@ -1,4 +1,4 @@
-SimName = "Test"
+SimName = "Test_R0p1.3_gamp0.005"
 FFlag = TRUE #Frequency
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
@@ -76,6 +76,16 @@ nFixVals3 <- length(FixVals3)
 
 TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 
+round2 = function(x, n) {
+  posneg = sign(x)
+  z = abs(x)*10^n
+  z = z + 0.5
+  z = trunc(z)
+  z = z/10^n
+  z*posneg
+}
+TExtMat <- round2(TExtMat,2)
+
 require(RColorBrewer)
 
 NTrials <- c()
@@ -95,7 +105,7 @@ for(i1 in 1:nFixVals1){
 		      parmat[,FixValName2]==F2 & parmat[,FixValName3]==F3 
 
 		#Which trials had pathogen until time VaccStartTime
-		wiTrialsToVacc = which(TExtMat[wifix,] > round(VaccStartTime + XVal,2))
+		wiTrialsToVacc = which(TExtMat[wifix,] > round2(VaccStartTime + XVal,2))
 		NTrialsToVacc = length(wiTrialsToVacc)
                 PExtMat[Xi,Yi] = sum(TExtMat[wifix,wiTrialsToVacc] < 
 			       (VaccStartTime + XVal + TCrit))/NTrialsToVacc

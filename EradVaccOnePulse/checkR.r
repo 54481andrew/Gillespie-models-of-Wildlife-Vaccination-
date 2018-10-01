@@ -1,4 +1,6 @@
-SimName = "Test"
+##CHECK BEFORE USE: RHS.FUN/RHS.FREQ.FUN
+
+SimName = "Test_R0p1.3_gamp0.005"
 parmat = read.table(file = paste("Data/",SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TVaccStart')
 
@@ -9,11 +11,11 @@ times = seq(0,10000)
 
 maxtimes <- 365*11
 timeseq  <- seq(0,maxtimes, by = 0.01)
-NPars = 5#length(parmat$Par)
+NPars = 1:length(parmat$Par)
 
-for(i in c(41)){
+for(i in NPars){
 
-y0 = c(1000, 0, 100, 0, 0)
+y0 = c(1000, 0, parmat$IpInit[i], 0, 0)
 names(y0) = c('S','Iv','Ip','V','P')
 
     VaccPer        <- parmat$T[i]
@@ -30,7 +32,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     tvaccstart <- parmat$TVaccStart[i]
     vacctimespre <- vacctimes[vacctimes < tvaccstart] #Vaccination starts 5 years in
     out1 <- data.frame(lsoda(y = y0, times = seq(0,tvaccstart,by=1), 
-                            func = rhs.fun, parms = parmat[i,],
+                            func = rhs.freq.fun, parms = parmat[i,],
                             events=list(func = vaccinate, time=vacctimespre),
                             maxsteps = 100000))
     y0 = out1[nrow(out1), -1]
@@ -39,7 +41,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     names(y0) = c('S','Iv','Ip','V','P')
     vacctimespost <- vacctimes[vacctimes >= tvaccstart]
     out2 <- data.frame(lsoda(y = y0, times = seq(tvaccstart, maxtimes, by = 1), 
-                            func = rhs.fun, parms = parmat[i,],
+                            func = rhs.freq.fun, parms = parmat[i,],
                             events=list(func = vaccinate, time=vacctimespost),
                             maxsteps = 100000))
     out = rbind(out1, out2[-1,])			
@@ -60,7 +62,7 @@ names(y0) = c('S','Iv','Ip','V','P')
 #    points(V~time, dat[these,], col = 'blue', cex = 0.25, pch = 1)
 #    points(P~time, dat[these,], col = 'pink', cex = 0.25, pch = 1)
     lines(S~time, out, type = 'l', lwd = 1, col = 'black')
-    lines(Ip~time, out, col = 'black', lty = 1, lwd = 1)
+    lines(Ip~time, out, col = 'gray', lty = 1, lwd = 1)
     legend = c('S','Iv','Ip','V','P')
     legend(x = "topright", legend = legend, col = c('black', 'green', 'red', 'blue', 'pink'), lwd = 2)
     

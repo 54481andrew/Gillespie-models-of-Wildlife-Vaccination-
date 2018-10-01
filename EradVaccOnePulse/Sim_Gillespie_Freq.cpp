@@ -28,21 +28,21 @@ vaccination.
 const int NTrials = 100;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 52;
+const int tvLEN = 1;
 const int tbLEN = 1; double tbvals[] = {45.0};
 const int BpLEN = 1; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 1; double rhovals[] = {1.5};
-const int gampLEN = 1; double gampvals[] = {0.017};
+const int gampLEN = 1; double gampvals[] = {0.005};
 
-const int NParSets = 52;
+const int NParSets = 1;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = true;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "Test";
+char SimName[50] = "Test_R0p1.3_gamp0.005_1Sim";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
@@ -252,7 +252,7 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0105,0.028,BpLEN);
-  R0pVals = Seq(4.0, 5.0, BpLEN);
+  R0pVals = Seq(1.3, 5.0, BpLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
@@ -310,7 +310,8 @@ void OneSim (double StartTime, double EndTime, bool StopOnErad = false)
 	  out_data << t << " " << S << " " << Iv << " " << Ip << " " << V << " " << P  << " " << NPop << " " << nbirths << " " << ndeaths <<  " " << ninfv << " " << ninfp << " " << nrecv << " " << nrecp << " " << S_death << " " << Iv_death << " " << Ip_death << " " << V_death << " " << P_death << " " << svacc << " " << npopvacc << " " << totvacc << " " << totbirthson << " " <<  totbirthsoff << "\n"; 
 	  ti += tick;
 	  nbirths = 0; ndeaths = 0; svacc = 0; npopvacc = 0; totvacc = 0; totbirthson = 0; 
-	  totbirthsoff = 0; 
+	  totbirthsoff = 0; P_death = 0; Ip_death=0; S_death=0; Iv_death=0;V_death=0; ninfp=0;
+	  nrecv=0; nrecp = 0;
 	}  
       Event_Rate = b + d*NPop + (Bp*S*Ip + Bp*Iv*Ip)/NPop + gamv*Iv + gamp*Ip;
       Event_Rate_Prod = Event_Rate*Rand();
