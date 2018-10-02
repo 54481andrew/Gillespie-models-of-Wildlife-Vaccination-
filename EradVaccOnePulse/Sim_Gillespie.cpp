@@ -29,20 +29,20 @@ const int NTrials = 1000;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
-const int tbLEN = 2; double tbvals[] = {45.0,90.0};
-const int BpLEN = 52; double bpvals[] = {0.0000213, 0.0000284, 0.00005, 0.0000568};
+const int tbLEN = 5; double tbvals[] = {30.0, 45.0, 90.0, 180.0, 240.0};
+const int BpLEN = 10; double bpvals[] = {0.0000213, 0.0000284, 0.00005, 0.0000568};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
-const int gampLEN = 3; double gampvals[] = {0.005,0.017,0.033};
+const int gampLEN = 5; double gampvals[] = {0.005,0.01,0.015, 0.02,0.03};
 
-const int NParSets = 48672;
+const int NParSets = 39000;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_1";
+char SimName[50] = "DeerMice_Base_LP";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
@@ -252,7 +252,7 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0000213,0.0000568,BpLEN);
-  R0pVals = Seq(1.01, 5.0, BpLEN);
+  R0pVals = Seq(1.1, 5.0, BpLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
