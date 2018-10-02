@@ -34,7 +34,9 @@ const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
 const int gampLEN = 5; double gampvals[] = {0.005, 0.01, 0.015, 0.02, 0.03};
+const int dLEN = 3; double dvals[] = {0.002, 0.001, 0.0005};
 
+//HEREHEREHERE
 const int NParSets = 39000;
 
 const int NumPars = 12; //Number of columns in ParMat
@@ -42,7 +44,7 @@ const bool VerboseWriteFlag = false;
 
 //********
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_Freq_LP";
+char SimName[50] = "DeerMice_Base_Freq_LP1";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
