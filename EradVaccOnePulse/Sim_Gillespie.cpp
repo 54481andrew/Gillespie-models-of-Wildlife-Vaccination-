@@ -1,4 +1,3 @@
-
 /*
 Build a simple c++ script that will 
 simulate a stochastic SIR epidemiological
@@ -6,10 +5,8 @@ model. The simulation procedes according
 to the Gillespie algorithm, and simulates 
 the use of vaccination to prevent the invasion
 of a zoonotic pathogen. 
-EradVaccOnePulse models a single pulse 
-vaccination. 
+EradVaccOnePulse models a single pulse vaccination. 
 */
-
 #include <iostream> // input/output std::cout, cin
 #include <math.h>   // Math functions
 #include <stdlib.h>
@@ -31,17 +28,20 @@ const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52;
 const int tbLEN = 5; double tbvals[] = {30.0, 45.0, 90.0, 180.0, 240.0};
 const int BpLEN = 10; double bpvals[] = {0.0000213, 0.0000284, 0.00005, 0.0000568};
+const int R0pLEN = 10; //double r0pvals[] = {1.1,1.5,2};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
 const int gampLEN = 5; double gampvals[] = {0.005,0.01,0.015, 0.02,0.03};
+const int dLEN = 3; double dvals[] = {0.002, 0.001, 0.0005};
 
 const int NParSets = 39000;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
-//********
+//************************
 //USER-ASSIGNED VARIABLES
+//************************
 char SimName[50] = "DeerMice_Base_LP";
 
 std::vector<double> tvVals;
@@ -54,6 +54,7 @@ std::vector<double> RhoVals;
 std::vector<int> IpInitVals;
 std::vector<double> tbVals; 
 std::vector<double> gampVals;
+std::vector<double> dVals;
 
 double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -230,7 +231,7 @@ void CheckEventConflict (){
     }
 }
 
-//************************************
+//*************************************************
 //Function that returns the time for the next event
 void GetTime (){
   // Select random time step (doesn't allow for infite time step)
@@ -241,8 +242,9 @@ void GetTime (){
     } while (dTime == INFINITY); //Avoid infinite timesteps
 }
 
-//************************************
+//******************************************
 //function to Initialize values of 2D array
+//******************************************
 void Initialize()
 {
   tvVals = Seq(0.1, 364.9, tvLEN);
@@ -252,15 +254,20 @@ void Initialize()
 
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0000213,0.0000568,BpLEN);
+
   R0pVals = Seq(1.1, 5.0, BpLEN);
+  //R0pVals.assign(r0pvals, r0pvals + R0pLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
   //NvVals = Seq(1.0,500.0,NvLEN);
   //NvVals.assign(nvvals,nvvals+NvLEN);  
+
   RhoVals.assign(rhovals, rhovals + RhoLEN);
 
   gampVals.assign(gampvals, gampvals + gampLEN);
+
+  dVals.assign(dvals, dvals + dLEN);
 
   //Fill in ParMat
   int i = 0;
@@ -271,21 +278,24 @@ void Initialize()
 	  for(int i5=0; i5<RhoVals.size(); i5++) //Note RhoVals
 	    for(int i6=0; i6<tbVals.size(); i6++)
 	      for(int i7=0; i7<gampVals.size(); i7++)
-		{
-		  ParMat[i][0] = i; //Par
-		  ParMat[i][1] = 4.0;   //b0
-		  ParMat[i][2] = 0.002; //d
-		  ParMat[i][3] = R0pVals[i2]*(0.002*365*(0.002 + gampVals[i7]))/(4.0*tbVals[i6]); //Bp
-		  ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*0.002); //Nv
-		  ParMat[i][5] = tvVals[i1]; //tv
-		  ParMat[i][6] = 0.07; //gamv
-		  ParMat[i][7] = gampVals[i7]; //gamp
-		  ParMat[i][8] = tbVals[i6]; //tb
-		  ParMat[i][9] = 365.0; //T
-		  ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-		  ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
-		  i++;
-		}
+		for(int i8=0; i8<dVals.size(); i8++)
+		  {
+		    d = dVals[i8];
+		    gamp = gampVals[i7];
+		    ParMat[i][0] = i; //Par
+		    ParMat[i][1] = 4.0;   //b0
+		    ParMat[i][2] = d; //d
+		    ParMat[i][3] = R0pVals[i2]*(d*365*(d + gampVals[i7]))/(4.0*tbVals[i6]); //Bp
+		    ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*d); //Nv
+		    ParMat[i][5] = tvVals[i1]; //tv
+		    ParMat[i][6] = 0.07; //gamv
+		    ParMat[i][7] = gampVals[i7]; //gamp
+		    ParMat[i][8] = tbVals[i6]; //tb
+		    ParMat[i][9] = 365.0; //T
+		    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
+		    ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
+		    i++;
+		  }
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)

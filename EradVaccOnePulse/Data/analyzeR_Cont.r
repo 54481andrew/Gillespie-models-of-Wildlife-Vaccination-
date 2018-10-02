@@ -1,4 +1,4 @@
-SimName = "DeerMice_Base_Freq_1"
+SimName = "DeerMice_Base_LP"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 
