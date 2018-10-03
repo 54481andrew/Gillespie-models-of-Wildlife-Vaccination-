@@ -1,6 +1,6 @@
 #Create a lineplot of extinction data
 
-SimName = "DeerMice_Base_1"
+SimName = "DeerMice_Base_LP"
 parmat = read.table(file = paste(SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TPathInv')
 
@@ -29,7 +29,8 @@ TExtMat = read.table(TExtMatFile, header = FALSE)
 XValName = 'tv'
 XVals = unique(parmat[,XValName])
 YValName = 'R0p'
-YVals = unique(parmat[,YValName])
+YVals = c(1.1, 1.53, 1.97, 2.4)
+#YVals = c(1.24, 1.48, 2.03, 2.5)#unique(parmat[,YValName])
 ZValName = 'ProbExt'
 
 FixValName1 = 'rho'
@@ -43,7 +44,7 @@ FigFold = paste(SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
 
 nXVals <- length(unique(parmat[,XValName]))
-nYVals <- length(unique(parmat[,YValName]))
+nYVals <- length(YVals)#length(unique(parmat[,YValName]))
 nFixVals1 <- length(FixVals1)
 nFixVals2 <- length(FixVals2)
 nFixVals3 <- length(FixVals3)
@@ -56,7 +57,7 @@ round2 = function(x, n) {
   z = z/10^n
   z*posneg
 }
-TCrit <- 365*1 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
+TCrit <- 365*1.5 #This script finds how many sim's made it time TCrit past the 1st pulse vaccination
 TExtMat <- round2(TExtMat,2)
 
 require(RColorBrewer)
@@ -95,15 +96,18 @@ axistext <- function(GraphMe){
 	switch(GraphMe, 
 	'Nv' = 'Number Vaccines', 
 	'tv' = 'Time of Vaccination',
-	'rho' = 'Scaled Number Vaccines')}
+	'rho' = 'Scaled Number Vaccines',
+	'R0p' = 'R0p')
+}
 
 if(zmin < zmax){
             FileName = paste('PExtLine_',TCrit,FixValName1, F1, FixValName2, F2,FixValName3,F3,'.png',sep='') 
             png(file = paste( FigFold, '/', FileName, sep=''), height = 4, width = 5, units = 'in', 
 	    	     res = 400)
             par(mai = c(1,1,0.25,0.25))
+	    PExtMat[is.na(PExtMat)] <- -1
 	    matplot(x = XVals, y = PExtMat, col = cols, 
-		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', ylim = c(0,1), 
+		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', ylim = c(0,1.5), 
 		    type = 'l', lwd = 2)
             axislabs = seq(0,365, by = 60)
             axislabs1 = YVals
@@ -112,7 +116,8 @@ if(zmin < zmax){
 	    mtext(text = axistext(XValName),side = 1, line = 3)
 	    mtext(text = "Probability of Extinction",side = 2, line = 3)
 	    abline(v = parmat$tb[wifix], lwd = 3, lty = 3)
-            dev.off()
+	    legend(x = 'topright', legend = paste(axistext(YValName),'=',round(YVals,1)), col = cols, lwd = 2) 
+           dev.off()
 
 print(paste("Figure", i, "complete",sep = " " ))
 }else{
