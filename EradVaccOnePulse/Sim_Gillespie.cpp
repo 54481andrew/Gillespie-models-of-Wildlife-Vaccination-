@@ -22,27 +22,27 @@ EradVaccOnePulse models a single pulse vaccination.
 //**********
 //CONSTANTS
 //**********
-const int NTrials = 1000;
+const int NTrials = 100;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 52;
-const int tbLEN = 5; double tbvals[] = {30.0, 45.0, 90.0, 180.0, 240.0};
+const int tvLEN = 2; double tvvals[] = {91.0, 250.0};
+const int tbLEN = 1; double tbvals[] = {90.0};
 const int BpLEN = 10; double bpvals[] = {0.0000213, 0.0000284, 0.00005, 0.0000568};
-const int R0pLEN = 10; //double r0pvals[] = {1.1,1.5,2};
+const int R0pLEN = 2; double r0pvals[] = {1.5, 5.0};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 3; double rhovals[] = {0.5, 1.0, 1.5};
-const int gampLEN = 5; double gampvals[] = {0.005,0.01,0.015, 0.02,0.03};
-const int dLEN = 3; double dvals[] = {0.002, 0.001, 0.0005};
+const int RhoLEN = 1; double rhovals[] = {0.5};
+const int gampLEN = 2; double gampvals[] = {0.005, 0.02};
+const int dLEN = 1; double dvals[] = {0.002};
 
-const int NParSets = 39000;
+const int NParSets = 2*2*2;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "DeerMice_Base_LP";
+char SimName[50] = "DeerMice_Base_LP_Ex";
 
 std::vector<double> tvVals;
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
@@ -247,7 +247,9 @@ void GetTime (){
 //******************************************
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  //tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals.assign(tvvals, tvvals + tvLEN);
+
   tbVals.assign(tbvals, tbvals + tbLEN);
 
   TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
@@ -255,8 +257,8 @@ void Initialize()
   //BpVals.assign(bpvals, bpvals + BpLEN);
   //BpVals = Seq(0.0000213,0.0000568,BpLEN);
 
-  R0pVals = Seq(1.1, 5.0, BpLEN);
-  //R0pVals.assign(r0pvals, r0pvals + R0pLEN);
+  //R0pVals = Seq(1.1, 5.0, BpLEN);
+  R0pVals.assign(r0pvals, r0pvals + R0pLEN);
 
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
 
