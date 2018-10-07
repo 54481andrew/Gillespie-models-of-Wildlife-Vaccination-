@@ -37,7 +37,6 @@ rhs.freq.fun = function(t,y,parms){
     })
 }
 
-
 vaccinate <- function(t,y,parms){
     S <- y[1]
     Iv <- y[2]
@@ -56,4 +55,31 @@ vaccinate <- function(t,y,parms){
 }
 
 
+###Analogous functions with just vaccination (jv)
 
+rhs.freq.jv.fun = function(t,y,parms){
+    S <- y[1]
+    Iv <- y[2]
+    V <- y[3]
+    N <- sum(y)
+    with(parms,{
+        dS = h(t,parms) - d*S
+        dIv = -(gamv + d)*Iv
+        dV = gamv*Iv - d*V
+        
+        return(list(c(dS,dIv,dV)))
+    })
+}
+
+vaccinate.jv = function(t,y,parms){
+    S <- y[1]
+    Iv <- y[2]
+    V <- y[3]
+    with(parms,{
+       nvacc <- round(min(S, Nv*S/(S + Iv + V)))
+	S   <- S - nvacc
+	Iv  <- Iv + nvacc
+	y <- c(S, Iv, V)
+	return(y)
+   })
+}
