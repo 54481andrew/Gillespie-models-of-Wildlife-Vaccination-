@@ -42,7 +42,7 @@ const bool VerboseWriteFlag = false;
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "A_Freq"
+char SimName[50] = "A_Freq";
 
 std::vector<double> tvVals;
 double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
