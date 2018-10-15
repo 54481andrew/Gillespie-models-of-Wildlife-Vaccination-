@@ -22,7 +22,7 @@ EradVaccOnePulse models a single pulse vaccination.
 //**********
 //CONSTANTS
 //**********
-const int NTrials = 1000;
+const int NTrials = 500;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52; //double tvvals[] = {90.0};
@@ -31,7 +31,7 @@ const int tbLEN = 1; double tbvals[] = {90.0};
 const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3, 5};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
-const int gampLEN = 2; double gampvals[] = {0.01, 0.03, 0.07};
+const int gampLEN = 2; double gampvals[] = {0.01, 0.03, 0.05};
 const int dLEN = 3; double dvals[] = {0.00274, 0.000913, 0.000274};
 
 const int NParSets = 26*4*3*2*3;
@@ -45,7 +45,7 @@ const bool VerboseWriteFlag = false;
 char SimName[50] = "A_Freq";
 
 std::vector<double> tvVals;
-double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
+double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals;
 std::vector<double> R0pVals;  
@@ -154,6 +154,7 @@ int main()
 	    Nv = 0.0; //No vaccination at first
 	    OneSim(0.0, TVaccStart + tv, true);
 	  } while(t < (TVaccStart + tv)); //Throw away sims that don't last TVaccstart+tv time
+	  std::cout << ntrial << "\n";
 	  
 	  //Simulate vaccination at time TVaccStart
 	  Nv = ParMat[Par][4]; //set Nv
@@ -249,8 +250,8 @@ void GetTime (){
 //******************************************
 void Initialize()
 {
-  //tvVals = Seq(0.1, 364.9, tvLEN);
-  tvVals.assign(tvvals, tvvals + tvLEN);
+  tvVals = Seq(0.1, 364.9, tvLEN);
+  //tvVals.assign(tvvals, tvvals + tvLEN);
 
   tbVals.assign(tbvals, tbvals + tbLEN);
 
