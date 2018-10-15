@@ -37,12 +37,12 @@ for(SimName in SimNameVals){
     
     print('Adding columns to parmat')
     refparmat = parmat
-    pcritname = 'pc'
+    pcritnamepre = 'pc'
     pcritvals <- c(0.99)
     ii <- 16 #New rows PExt
     for(pcrit in pcritvals){
         parmat[,ii] <- NA #Create column
-        names(parmat)[ii] <- paste(pcritname,pcrit,sep='')#name it
+        names(parmat)[ii] <- paste(pcritnamepre,pcrit,sep='')#name it
         ii <- ii + 1
     }
 
@@ -56,7 +56,7 @@ for(SimName in SimNameVals){
 ###Loop through pcritvals
         for(pcrit in pcritvals){
 	    TCrit <- with(parmat[i,], -1/(d+gamp)*log(1-pcrit))
-            pcritname <- paste(pcritname,pcrit,sep='')
+            pcritname <- paste(pcritnamepre,pcrit,sep='')
             if(length(wiTrialsToVacc)==0)
             {
                 refparmat[i,pcritname] <- NA

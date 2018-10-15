@@ -24,27 +24,38 @@ of a zoonotic pathogen.
 //CONSTANTS
 //***********
 const int NTrials = 1000;
-const int TVaccLEN = 1;
+const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 52;
-const int BpLEN = 3; double bpvals[] = {0.0083,0.0125,0.0187};
-const int NvLEN = 52;
-const int NParSets = 8112;
+const int tvLEN = 52; //double tvvals[] = {90.0};
+const int tbLEN = 1; double tbvals[] = {90.0};
+//const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
+const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3, 5};
+//const int NvLEN = 3; int nvvals[] = {};
+const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
+const int gampLEN = 2; double gampvals[] = {0.01, 0.03, 0.07};
+const int dLEN = 3; double dvals[] = {0.00274, 0.000913, 0.000274};
+
+const int NParSets = 26*4*3*2*3;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
-//********
+//************************
 //USER-ASSIGNED VARIABLES
-char SimName[50] = "DeerMice_Base_Freq";
+//************************
+char SimName[50] = "A_Freq";
 
 std::vector<double> tvVals;
-
 double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
 std::vector<double> TVaccStartVals;
-std::vector<double> BpVals; 
+std::vector<double> BpVals;
+std::vector<double> R0pVals;  
 std::vector<double> NvVals;
+std::vector<double> RhoVals;
 std::vector<int> IpInitVals; 
+std::vector<double> tbVals;
+std::vector<double> gampVals;
+std::vector<double> dVals;
 
 double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -132,24 +143,26 @@ int main()
  
       for(ntrial = 0; ntrial < NTrials; ntrial++)
 	{
-	  S = SInit; //S
-	  Iv = 0; //Iv
-	  Ip = IpInit; //Ip introduced immediately
-	  V = 0; //V
-	  P = 0; //P
-	  NPop = S + Iv + Ip + V + P;
-	  
-	  //Simulate to quasi steady state (rewrites State)
-	  Nv = 0.0; //No vaccination at first
-	  OneSim(0.0, TVaccStart, false);
-
-	  //Simulate invasion until TMax years, or pathogen extinction
-	  Nv = ParMat[Par][4]; //Nv 
-	  OneSim(TVaccStart, TMax, true);
-	  
-	  //Store final value of t in TExtMat
-	  TExtMat[Par][ntrial] = t;	      
-	}//End loop through NTrials
+	  do {
+	    S = SInit; //S
+	    Iv = 0; //Iv
+	    Ip = IpInit; //Ip introduced immediately
+	    V = 0; //V
+	    P = 0; //P
+	    NPop = S + Iv + Ip + V + P;
+	    
+	    //Simulate to quasi steady state (rewrites State)
+	    Nv = 0.0; //No vaccination at first
+	    OneSim(0.0, TVaccStart, true);
+	  } while(t < (TVaccStart)); //Throw away sims that don't last TVaccstart+tv time
+	    
+	    //Simulate invasion until TMax years, or pathogen extinction
+	    Nv = ParMat[Par][4]; //Nv 
+	    OneSim(TVaccStart, TMax, true);
+	    
+	    //Store final value of t in TExtMat
+	    TExtMat[Par][ntrial] = t;	      
+	 }//End loop through NTrials
 
       if(VerboseWriteFlag)
 	{
@@ -232,35 +245,57 @@ void GetTime (){
 //function to Initialize values of 2D array
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
+  //tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals.assign(tvvals, tvvals + tvLEN);
+
+  tbVals.assign(tbvals, tbvals + tbLEN);
+
   TVaccStartVals = Seq(TVaccMIN, TVaccMAX, TVaccLEN);
-  BpVals.assign(bpvals, bpvals + BpLEN);
-  //BpVals = Seq(0.00001,0.0001,BpLEN);
+
+  //BpVals.assign(bpvals, bpvals + BpLEN);
+  //BpVals = Seq(0.0105,0.028,BpLEN);
+
+  //R0pVals = Seq(1.1, 5.0, BpLEN);
+  R0pVals.assign(r0pvals, r0pvals + R0pLEN);
+
   IpInitVals.assign(ipinitvals, ipinitvals + IpInitLEN);
-  NvVals = Seq(1.0,500.0,NvLEN);
+
+  //NvVals = Seq(1.0,500.0,NvLEN);
+  //NvVals.assign(nvvals,nvvals+NvLEN);
+
+  RhoVals.assign(rhovals, rhovals + RhoLEN);
+
+  gampVals.assign(gampvals, gampvals + gampLEN);
+
+  dVals.assign(dvals, dvals + dLEN);
   
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
-    for(int i2=0; i2<BpVals.size(); i2++)
+    for(int i2=0; i2<R0pVals.size(); i2++) //Note R0pVals
       for(int i3=0; i3<TVaccStartVals.size(); i3++)
 	for(int i4=0; i4<IpInitVals.size(); i4++)
-	  for(int i5=0; i5<NvVals.size(); i5++)
-	    {
-	      ParMat[i][0] = i; //Par
-	      ParMat[i][1] = 4.0;   //b0
-	      ParMat[i][2] = 0.004; //d
-	      ParMat[i][3] = BpVals[i2]; //Bp
-	      ParMat[i][4] = NvVals[i5]; //Nv
-	      ParMat[i][5] = tvVals[i1]; //tv
-	      ParMat[i][6] = 0.07; //gamv
-	      ParMat[i][7] = 0.007; //gamp
-	      ParMat[i][8] = 90.0; //tb
-	      ParMat[i][9] = 365.0; //T
-	      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-	      ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
-	      i++;
-	    }
+	  for(int i5=0; i5<RhoVals.size(); i5++) //Note RhoVals
+	    for(int i6=0; i6<tbVals.size(); i6++)
+	      for(int i7=0; i7<gampVals.size(); i7++)
+		for(int i8=0; i8<dVals.size(); i8++)
+		  {
+		    d = dVals[i8];
+		    gamp = gampVals[i7];
+		    ParMat[i][0] = i; //Par
+		    ParMat[i][1] = 4.0;   //b0
+		    ParMat[i][2] = d; //d
+		    ParMat[i][3] = R0pVals[i2]*(d + gamp); //Bp
+		    ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*d); //Nv
+		    ParMat[i][5] = tvVals[i1]; //tv
+		    ParMat[i][6] = 0.07; //gamv
+		    ParMat[i][7] = gampVals[i7]; //gamp
+		    ParMat[i][8] = tbVals[i6]; //tb
+		    ParMat[i][9] = 365.0; //T
+		    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
+		    ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
+		    i++;
+		  }
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)

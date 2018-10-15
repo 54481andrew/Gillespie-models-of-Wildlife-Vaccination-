@@ -32,7 +32,7 @@ const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3, 5};
 //const int NvLEN = 11; double nvvals[] = {450.0};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 2; double gampvals[] = {0.01, 0.03};
-const int dLEN = 3; double dvals[] = {0.00274, 0.33, 0.000274};
+const int dLEN = 3; double dvals[] = {0.00274, 0.000913, 0.000274};
 
 const int NParSets = 97344;
 
@@ -42,7 +42,7 @@ const bool VerboseWriteFlag = false;
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "A_Freq";
+char SimName[50] = "A_Freq_1";
 
 std::vector<double> tvVals;
 double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
