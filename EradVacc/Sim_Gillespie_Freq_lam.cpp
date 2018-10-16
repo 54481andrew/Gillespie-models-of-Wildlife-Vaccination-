@@ -25,7 +25,7 @@ of a zoonotic pathogen.
 //***********
 const int NTrials = 1;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
-const int IpInitLEN = 1; int ipinitvals[]={0};
+const int IpInitLEN = 1; int ipinitvals[]={5};
 const int tvLEN = 26; //double tvvals[] = {90.0};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
@@ -34,9 +34,9 @@ const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3, 5};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 3; double gampvals[] = {0.01, 0.03, 0.07};
 const int dLEN = 1; double dvals[] = {0.00274};
-const int lamLEN = 1; double lamvals[] = {0.005};
+const int lamLEN = 2; double lamvals[] = {0.005,0.01};
 
-const int NParSets = 26*4*3*3;
+const int NParSets = 26*4*3*3*2;
 
 const int NumPars = 14; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -154,7 +154,7 @@ int main()
 	{
 	    S = SInit; //S
 	    Iv = 0; //Iv
-	    Ip = 5; //Ip introduced immediately
+	    Ip = IpInit; //Ip introduced immediately
 	    V = 0; //V
 	    P = 0; //P
 	    NPop = S + Iv + Ip + V + P;
