@@ -29,14 +29,14 @@ const int IpInitLEN = 1; int ipinitvals[]={5};
 const int tvLEN = 26; //double tvvals[] = {90.0};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3, 5};
+const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 3; double gampvals[] = {0.01, 0.03, 0.07};
 const int dLEN = 1; double dvals[] = {0.00274};
-const int lamLEN = 2; double lamvals[] = {0.005,0.01};
+const int lamLEN = 4; double lamvals[] = {0.005, 0.01, 0.05, 0.1};
 
-const int NParSets = 26*4*3*3*2;
+const int NParSets = 26*5*3*3*4;
 
 const int NumPars = 14; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -48,7 +48,7 @@ char SimName[50] = "B_Freq_lam";
 
 std::vector<double> tvVals;
 double TVaccMIN = 0; double TVaccMAX = 6*365;
-double TBurnIn = 50*365; // Burn-in time for simulations
+double TBurnIn = 200*365; // Burn-in time for simulations
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals;
 std::vector<double> R0pVals;  
@@ -60,7 +60,7 @@ std::vector<double> gampVals;
 std::vector<double> dVals;
 std::vector<double> lamVals;
 
-double TMax = 1001.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 2000.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
