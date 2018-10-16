@@ -29,7 +29,7 @@ const int IpInitLEN = 1; int ipinitvals[]={5};
 const int tvLEN = 26; //double tvvals[] = {90.0};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
+const int R0pLEN = 5; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 3; double gampvals[] = {0.01, 0.03, 0.07};
@@ -220,7 +220,7 @@ void ApplyEvent() {
   else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip) //Event: Ip Recovery
     {if(Ip==1 && t > TBurnIn){EradCount++;}; Ip--; P++; nrecp++;} //Count as eradication
   else if(Event_Rate_Prod <= b + d*NPop + (Bp*Ip*S + Bp*Ip*Iv)/NPop + gamv*Iv + gamp*Ip + lam) //Event: Spontaneous Infection!
-    {Ip++;ninfp++;}
+    {Ip++; ninfp++; NPop++;}
 }
 
 //*************************************
