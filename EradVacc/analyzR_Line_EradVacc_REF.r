@@ -1,5 +1,5 @@
 #Create a lineplot of extinction data reading modified parmat in 
-SimName = "B_Freq_lam"
+SimName = "B_lam"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -107,7 +107,8 @@ if(zmin < zmax){
 	    mtext(text = "Rate of Extinction",side = 2, line = 3)
 	    abline(v = parmat$tb[wivals][1], lwd = 3, lty = 3)
 	    legend(x = 'topright', legend = paste(axistext(YValName),'=',round(YVals,1)), col = cols, lwd = 2) 
-           dev.off()
+
+dev.off()
 
 print(paste("Figure", i, "complete",sep = " " ))
 }else{

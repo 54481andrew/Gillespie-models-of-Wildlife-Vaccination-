@@ -1,8 +1,8 @@
 require(parallel)
 
-SimName = "LagImport.TMax40.drates"
+SimName = "LagImport.TMax40.1yr"
 
-parmat = expand.grid(NPar = 0, b0 = NA, d = c(0.0005,0.001,0.002,0.005), 
+parmat = expand.grid(NPar = 0, b0 = NA, d = c(0.00274), 
        	             rho = seq(0.01,1,length.out = 50),
                      gamv =0.07, tb = seq(15,365,length.out = 50),
                      T = 365, NAvg = 10000, tvstar = 0, 

@@ -1,6 +1,7 @@
-SimName = "LagImport"
+require(parallel)
+SimName = "LagImport_1yr"
 
-parmat = expand.grid(NPar = 0, b0 = NA, d = 0.002, rho = seq(0,1,length.out = 10),
+parmat = expand.grid(NPar = 0, b0 = NA, d = 0.00274, rho = seq(0,1,length.out = 10),
                      tv = seq(0.1,365,length.out = 20), gamv =0.07, tb = seq(15,365,length.out = 10),
                      T = 365, NAvg = 10000, VAvg = 0)
 
@@ -12,7 +13,7 @@ parmat$Nv = with(parmat,rho*NAvg)
 require(deSolve)
 source('Tools/Functions.r', local = TRUE)
 
-maxtimes <- 365*20
+maxtimes <- 365*40
 times    <- seq(0,maxtimes, by = 0.01)
 
 filename = paste("ODEData/", SimName, sep = '')
@@ -72,3 +73,4 @@ for(xi in 1:nXVals){
         Import.Mat[xi,yi] <- VAvgStar/VNull
     }
 }
+write.table(refparmat, file = filename, append = F, row.names = F)
