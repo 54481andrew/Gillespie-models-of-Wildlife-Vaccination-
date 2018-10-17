@@ -24,17 +24,17 @@ of a zoonotic pathogen.
 //***********
 const int NTrials = 500;
 const int TPathLEN = 26;
-const int IpInitLEN = 1; int ipinitvals[]={10};
+const int IpInitLEN = 2; int ipinitvals[]={5, 10};
 const int tvLEN = 26; 
-const int tbLEN = 5; double tbvals[] = {30.0, 45.0, 90.0, 180.0, 240.0};
-const int BpLEN = 3; double bpvals[] = {0.00005,0.00007};
-const int R0pLEN = 3; double r0pvals[] = {1.1,1.5,2};
+const int tbLEN = 2; double tbvals[] = {30.0, 90.0};
+//const int BpLEN = 3; double bpvals[] = {0.00005,0.00007};
+const int R0pLEN = 5; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 11; double nvvals[] = {450.0};
-const int RhoLEN = 1; double rhovals[] = {1};
-const int gampLEN = 3; double gampvals[] = {0.005, 0.01, 0.02};
-const int dLEN = 3; double dvals[] = {0.002, 0.001, 0.0005};
+const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
+const int gampLEN = 3; double gampvals[] = {0.01, 0.03, 0.07};
+const int dLEN = 1; double dvals[] = {0.00274};
 
-const int NParSets = 91260;
+const int NParSets = TPathLEN*IpInitLEN*tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -42,7 +42,7 @@ const bool VerboseWriteFlag = false;
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "DeerMice_Base_LP";
+char SimName[50] = "B_1";
 
 std::vector<double> tvVals;
 double TPathMIN = 8*365+0.01; double TPathMAX = 9*365 - 0.01; 
