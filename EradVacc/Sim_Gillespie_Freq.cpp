@@ -27,15 +27,15 @@ const int NTrials = 500;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52; //double tvvals[] = {90.0};
-const int tbLEN = 1; double tbvals[] = {90.0};
+const int tbLEN = 2; double tbvals[] = {60.0, 90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3};
+const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
-const int gampLEN = 2; double gampvals[] = {0.03, 0.05};
-const int dLEN = 3; double dvals[] = {0.00274};
+const int gampLEN = 2; double gampvals[] = {0.01, 0.03};
+const int dLEN = 2; double dvals[] = {0.00274, 0.00548};
 
-const int NParSets = 26*4*3*2*1;
+const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -43,7 +43,7 @@ const bool VerboseWriteFlag = false;
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "A_Freq";
+char SimName[50] = "C_Freq";
 
 std::vector<double> tvVals;
 double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
