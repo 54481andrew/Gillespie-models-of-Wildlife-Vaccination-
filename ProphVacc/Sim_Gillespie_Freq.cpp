@@ -24,17 +24,18 @@ of a zoonotic pathogen.
 //***********
 const int NTrials = 500;
 const int TPathLEN = 26;
-const int IpInitLEN = 1; int ipinitvals[]={5};
+const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 26; 
-const int tbLEN = 2; double tbvals[] = {60.0, 90.0};
+const int tbLEN = 2; double tbvals[] = {90.0};
 //const int BpLEN = 3; double bpvals[] = {0.00005,0.00007};
 const int R0pLEN = 5; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 11; double nvvals[] = {450.0};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 3; double gampvals[] = {0.01, 0.03, 0.07};
 const int dLEN = 2; double dvals[] = {0.00274, 0.00548};
+const int bLEN = 1; double bvals[] = {4};
 
-const int NParSets = TPathLEN*IpInitLEN*tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN;
+const int NParSets = TPathLEN*IpInitLEN*tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN*bLEN;
 
 const int NumPars = 12; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
@@ -55,6 +56,7 @@ std::vector<int> IpInitVals;
 std::vector<double> tbVals;  
 std::vector<double> gampVals;
 std::vector<double> dVals;
+std::vector<double> bVals;
 
 double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -273,6 +275,8 @@ void Initialize()
 
   dVals.assign(dvals, dvals + dLEN);
 
+  bVals.assign(bvals, bvals + bLEN);
+
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
@@ -283,23 +287,25 @@ void Initialize()
 	    for(int i6=0; i6<tbVals.size(); i6++)
 	      for(int i7=0; i7<gampVals.size(); i7++)
 		for(int i8=0; i8<dVals.size(); i8++)
-		  {
-		    d = dVals[i8];
-		    gamp = gampVals[i7];
-		    ParMat[i][0] = i; //Par
-		    ParMat[i][1] = 4.0;   //b0
-		    ParMat[i][2] = d; //d
-		    ParMat[i][3] = R0pVals[i2]*(d + gamp); //Bp
-		    ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*d); //Nv
-		    ParMat[i][5] = tvVals[i1]; //tv
-		    ParMat[i][6] = 0.07; //gamv
-		    ParMat[i][7] = gampVals[i7]; //gamp
-		    ParMat[i][8] = tbVals[i6]; //tb
-		    ParMat[i][9] = 365.0; //T
-		    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
-		    ParMat[i][11] = TPathInvVals[i3]; //TPathInv
-		    i++;
-		  }
+		  for(int i9=0; i9<bVals.size();i9++)
+		    {
+		      d = dVals[i8];
+		      b = bVals[i9];
+		      gamp = gampVals[i7];
+		      ParMat[i][0] = i; //Par
+		      ParMat[i][1] = b;   //b0
+		      ParMat[i][2] = d; //d
+		      ParMat[i][3] = R0pVals[i2]*(d + gamp); //Bp
+		      ParMat[i][4] = RhoVals[i5]*b*tbVals[i6]/(365*d); //Nv
+		      ParMat[i][5] = tvVals[i1]; //tv
+		      ParMat[i][6] = 0.07; //gamv
+		      ParMat[i][7] = gampVals[i7]; //gamp
+		      ParMat[i][8] = tbVals[i6]; //tb
+		      ParMat[i][9] = 365.0; //T
+		      ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
+		      ParMat[i][11] = TPathInvVals[i3]; //TPathInv
+		      i++;
+		    }
 }
 
 void OneSim (double StartTime, double EndTime, bool StopOnErad = false)

@@ -7,7 +7,7 @@ round2 = function(x, n) {
     z*posneg
 }
 
-SimNameVals = c("B_1")
+SimNameVals = c("C_Freq")
 FoldNames = c("Data/")
 
 for(FoldName in FoldNames){

@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "B_lam"
+SimName = "C_lam"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -31,15 +31,14 @@ ZValName = 'ExtRate'
 
 #
 
-FixValName1 = 'lam'
-FixVals1 = c(0.01) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
-FixValName2 = 'rho'
-FixVals2 = c(0.5,1.5) 
+FixValName1 = 'd'
+FixVals1 = c(0.00274,0.00548) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
+FixValName2 = 'tb'
+FixVals2 = c(60,90) 
 FixValName3 = 'gamp'
 FixVals3 = c(0.07, 0.01) 
-FixValName4 = 'd'
-FixVals4 = c(0.00274)
-F4 = 0.00274
+FixValName4 = 'rho'
+F4 = 1
 
 FigFold = paste('Data/',SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
@@ -122,8 +121,8 @@ if(zmin < zmax){
 		    ylim = c(0,zmax), type = 'l', lwd = 2, lty = 1)
 
 
-
-polygon(x = c(0,90, 90, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
+tbval <- unique(parmat$tb[wivals])
+polygon(x = c(0,tbval, tbval, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
 
             axislabs = seq(0,365, by = 120)
             axislabs1 = YVals
@@ -138,7 +137,8 @@ polygon(x = c(0,90, 90, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =
 	    if(i2==1 & i3==1){legend(x = 'bottomright', legend = paste(axistext(YValName),'=',round(YVals,1)), col = cols, lwd = 2) }
 
 #Variable name varied across panels
-legendtext = c(paste(round(1/FixVals3[i3]),'day infection'), paste(FixVals2[i2], 'vaccines / host'))
+#legendtext = c(paste(round(1/FixVals3[i3]),'day infection'), paste(FixVals2[i2], 'vaccines / host'))
+legendtext = c(paste(round(1/FixVals3[i3]),'day infection'), paste(FixVals2[i2], 'breeding season'))
 legend(x = 120, y = 0.01075, legend = legendtext, bty = 'n')
 
 

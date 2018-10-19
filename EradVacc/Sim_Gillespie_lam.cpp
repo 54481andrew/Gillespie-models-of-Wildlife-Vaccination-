@@ -48,7 +48,7 @@ char SimName[50] = "C_lam";
 
 std::vector<double> tvVals;
 double TVaccMIN = 0; double TVaccMAX = 6*365;
-double TBurnIn = 200*365; // Burn-in time for simulations
+double TBurnIn = 500*365; // Burn-in time for simulations
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals;
 std::vector<double> R0pVals;  
@@ -60,7 +60,7 @@ std::vector<double> gampVals;
 std::vector<double> dVals;
 std::vector<double> lamVals;
 
-double TMax = 2000.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 10000.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 

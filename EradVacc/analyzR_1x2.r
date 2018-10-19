@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "B_lam"
+SimName = "C_Freq_lam"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -123,8 +123,8 @@ if(zmin < zmax){
 		    ylim = c(0,zmax), type = 'l', lwd = 2, lty = 1)
 
 
-
-polygon(x = c(0,90, 90, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
+tbval <- unique(parmat$tb[wivals])
+polygon(x = c(0,tbval, tbval, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
 
             axislabs = seq(0,365, by = 120)
             axislabs1 = YVals

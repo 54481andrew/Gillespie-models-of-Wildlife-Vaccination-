@@ -29,11 +29,12 @@ const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 52; //double tvvals[] = {90.0};
 const int tbLEN = 2; double tbvals[] = {60.0, 90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3};
+const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 2; double gampvals[] = {0.01, 0.02};
-const int dLEN = 1; double dvals[] = {0.00274};
+const int dLEN = 1; double dvals[] = {0.00548};
+const int bLEN = 1; double bvals[] = {4};
 
 const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN;
 
@@ -70,7 +71,7 @@ double TExtMat [NParSets][NTrials];
 //*******************
 //CRITICAL VARIABLES
 //*******************
-int S, Iv, Ip, V, P, NPop, Par, IpInit;
+int S, Iv, Ip, V, P, NPop, Par, IpInit, NFails;
 char FileNamePar[50];
 char FileNameTExt[50];
 char DirName[50] = "Data/";
@@ -143,6 +144,7 @@ int main()
  
       for(ntrial = 0; ntrial < NTrials; ntrial++)
 	{
+	  NFails = 0;
 	  do {
 	    S = SInit; //S
 	    Iv = 0; //Iv
@@ -154,14 +156,18 @@ int main()
 	    //Simulate to quasi steady state (rewrites State)
 	    Nv = 0.0; //No vaccination at first
 	    OneSim(0.0, TVaccStart, true);
-	  } while(t < (TVaccStart)); //Throw away sims that don't last TVaccstart+tv time
+	    NFails++;
+	  } while(t < ( TVaccStart) && NFails < 100 ); 
+	  //above while: Throw away sims that don't last TVaccstart+tv time, 
+	  //quit after ntrials failures
 
 	  std::cout << ntrial << "\n";
 	    
+	  if(t > TVaccStart){
 	    //Simulate invasion until TMax years, or pathogen extinction
 	    Nv = ParMat[Par][4]; //Nv 
 	    OneSim(TVaccStart, TMax, true);
-	    
+	  }
 	    //Store final value of t in TExtMat
 	    TExtMat[Par][ntrial] = t;	      
 	 }//End loop through NTrials
