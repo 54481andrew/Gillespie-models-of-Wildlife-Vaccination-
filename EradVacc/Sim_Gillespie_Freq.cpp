@@ -32,8 +32,8 @@ const int tbLEN = 2; double tbvals[] = {60.0, 90.0};
 const int R0pLEN = 4; double r0pvals[] = {1.1, 1.5, 2, 3};
 //const int NvLEN = 3; int nvvals[] = {};
 const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
-const int gampLEN = 2; double gampvals[] = {0.01, 0.03};
-const int dLEN = 2; double dvals[] = {0.00274, 0.00548};
+const int gampLEN = 2; double gampvals[] = {0.01, 0.02};
+const int dLEN = 1; double dvals[] = {0.00274};
 
 const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN;
 
