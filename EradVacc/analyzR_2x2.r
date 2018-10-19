@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "B_Freq_lam_1"
+SimName = "B_lam"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -31,15 +31,15 @@ ZValName = 'ExtRate'
 
 #
 
-FixValName1 = 'tb'
-FixVals1 = c(30,90) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
+FixValName1 = 'lam'
+FixVals1 = c(0.01) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'rho'
 FixVals2 = c(0.5,1.5) 
 FixValName3 = 'gamp'
 FixVals3 = c(0.07, 0.01) 
-FixValName4 = 'lam'
-FixVals4 = c(0.01)
-F4 = 0.01
+FixValName4 = 'd'
+FixVals4 = c(0.00274)
+F4 = 0.00274
 
 FigFold = paste('Data/',SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}
@@ -121,14 +121,9 @@ if(zmin < zmax){
 		    xaxt = 'n', yaxt = 'n', xlab = '', ylab = '', 
 		    ylim = c(0,zmax), type = 'l', lwd = 2, lty = 1)
 
-       xii = apply(ExtMat, MARGIN = 2, FUN = which.max)
-for(ii in 1:ncol(ExtMat)){
-       matpoints(XVals[xii[ii]], ExtMat[xii[ii],ii], pch = 8, lwd = 2, col = cols[ii])
-}
 
 
-tbval <- unique(parmat$tb[wivals])
-polygon(x = c(0,tbval, tbval, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
+polygon(x = c(0,90, 90, 0), y = c(-1,-1,1,1), col = colfun('gray', 75), border =NA)
 
             axislabs = seq(0,365, by = 120)
             axislabs1 = YVals

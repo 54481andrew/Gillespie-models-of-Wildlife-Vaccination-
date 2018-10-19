@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "B_lam_Freq_1"
+SimName = "B_lam"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
