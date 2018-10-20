@@ -31,7 +31,7 @@ const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
 const int R0pLEN = 5; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 4; double rhovals[] = {0.5, 1, 1.5};
+const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
 const int gampLEN = 3; double gampvals[] = {0.01, 0.033, 0.07};
 const int dLEN = 1; double dvals[] = {0.00548};
 const int bLEN = 5; double bvals[] = {5,10,25,50,100};
