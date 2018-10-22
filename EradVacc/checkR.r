@@ -1,10 +1,11 @@
-SimName = "Freq_DeerMice_Base";
-parmat = read.table(file = paste("Data/ParMat_", SimName, sep=''), header = F)
+SimName = "D_1T"
+parmat = read.table(file = paste("Data/",SimName,"/ParMat", sep=''), header = F)
 names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TVaccStart')
 
 require(deSolve)
 source('Tools/Functions.r', local = TRUE)
 
+bythese <- 10
 times = seq(0,10000)
 
 maxtimes <- 365*11
@@ -54,7 +55,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = bythese)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
@@ -79,7 +80,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
     lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = bythese)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)
@@ -106,7 +107,7 @@ names(y0) = c('S','Iv','Ip','V','P')
 #    lines(V~time, out, col = 'blue', lty = 1, lwd = 1)
 #    lines(P~time, out, col = 'pink', lty = 1, lwd = 1)
     
-    these <- seq(1,nrow(dat), by = 1000)
+    these <- seq(1,nrow(dat), by = bythese)
     points(S~time, dat[these,], col = 'black', cex = 0.25, pch = 1)
     points(Iv~time, dat[these,], col = 'green', cex = 0.25, pch = 1)
     points(Ip~time, dat[these,], col = 'red', cex = 0.25, pch = 1)

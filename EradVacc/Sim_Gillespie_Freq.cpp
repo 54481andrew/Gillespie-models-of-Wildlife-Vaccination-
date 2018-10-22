@@ -72,7 +72,7 @@ double TExtMat [NParSets][NTrials];
 //*******************
 //CRITICAL VARIABLES
 //*******************
-int S, Iv, Ip, V, P, NPop, Par, IpInit, NFails;
+int S, Iv, Ip, V, P, NPop, Par, IpInit, NFails, NFailsTot;
 char FileNamePar[50];
 char FileNameTExt[50];
 char DirName[50] = "Data/";

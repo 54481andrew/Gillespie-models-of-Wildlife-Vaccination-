@@ -23,28 +23,28 @@ of a zoonotic pathogen.
 //***********
 //CONSTANTS
 //***********
-const int NTrials = 1000;
+const int NTrials = 10;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 26; //double tvvals[] = {90.0};
+const int tvLEN = 1; double tvvals[] = {200};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 5; double r0pvals[] = {1.1, 1.5, 2, 3, 5};
+const int R0pLEN = 1; double r0pvals[] = {2};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
-const int gampLEN = 3; double gampvals[] = {0.01, 0.033, 0.07};
+const int RhoLEN = 2; double rhovals[] = {0,5};
+const int gampLEN = 1; double gampvals[] = {0.03};
 const int dLEN = 1; double dvals[] = {0.00548};
-const int bLEN = 5; double bvals[] = {5,10,25,50,100};
+const int bLEN = 1; double bvals[] = {200};
 
 const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN*bLEN;
 
 const int NumPars = 12; //Number of columns in ParMat
-const bool VerboseWriteFlag = false;
+const bool VerboseWriteFlag = true;
 
 //************************
 //USER-ASSIGNED VARIABLES
 //************************
-char SimName[50] = "D";
+char SimName[50] = "D_1T";
 
 std::vector<double> tvVals;
 double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
@@ -253,8 +253,8 @@ void GetTime (){
 //******************************************
 void Initialize()
 {
-  tvVals = Seq(0.1, 364.9, tvLEN);
-  //tvVals.assign(tvvals, tvvals + tvLEN);
+  //tvVals = Seq(0.1, 364.9, tvLEN);
+  tvVals.assign(tvvals, tvvals + tvLEN);
 
   tbVals.assign(tbvals, tbvals + tbLEN);
 

@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "C_lam"
+SimName = "D_Freq"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -32,9 +32,9 @@ ZValName = 'ExtRate'
 #
 
 FixValName1 = 'd'
-FixVals1 = c(0.00274,0.00548) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
+FixVals1 = c(0.00548) #unique(parmat[,FixValName1])#c(0.00001,0.00005,0.0001)
 FixValName2 = 'tb'
-FixVals2 = c(60,90) 
+FixVals2 = c(90) 
 FixValName3 = 'gamp'
 FixVals3 = c(0.07, 0.01) 
 FixValName4 = 'rho'
