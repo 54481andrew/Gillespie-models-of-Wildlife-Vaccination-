@@ -1,5 +1,5 @@
 #Create a 1x2 lineplot of extinction data reading modified parmat in 
-SimName = "C_Freq_lam"
+SimName = "D_Freq"
 FoldName = c("Data/")
 FileName <- paste(FoldName, SimName,sep='')
 
@@ -38,8 +38,7 @@ FixVals2 = c(0.5,1.5)
 FixValName3 = 'gamp'
 FixVals3 = c(0.07, 0.01) 
 FixValName4 = 'd'
-FixVals4 = c(0.00274)
-F4 = 0.00274
+F4 = 0.00548
 
 FigFold = paste('Data/',SimName,'_Fig',sep='')
 if(!dir.exists(FigFold)){dir.create(FigFold)}

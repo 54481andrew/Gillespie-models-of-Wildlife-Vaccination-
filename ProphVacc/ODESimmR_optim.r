@@ -1,10 +1,10 @@
 require(parallel)
 
-SimName = "LagImport.TMax40.1yr"
+SimName = "d_vs_tb"
 
-parmat = expand.grid(NPar = 0, b0 = NA, d = c(0.00274), 
-       	             rho = seq(0.01,1,length.out = 50),
-                     gamv =0.07, tb = seq(15,365,length.out = 50),
+parmat = expand.grid(NPar = 0, b0 = NA, d = seq(0.0002, 0.00548, length.out = 51), 
+       	             rho = c(0.25, 1, 2),
+                     gamv =0.07, tb = seq(15,365,length.out = 51),
                      T = 365, NAvg = 10000, tvstar = 0, 
 		     vavgstar = 0, vnull = 0)
 

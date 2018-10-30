@@ -29,12 +29,12 @@ const int IpInitLEN = 1; int ipinitvals[]={100};
 const int tvLEN = 26; //double tvvals[] = {90.0};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 10; double r0pvals[] = {1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0};
+const int R0pLEN = 5; double r0pvals[] = {1.2,1.4, 1.6, 1.8, 2.0};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 5; double rhovals[] = {0.25, 0.5, 0.75, 1, 2};
-const int gampLEN = 7; double gampvals[] = {0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07};
+const int RhoLEN = 4; double rhovals[] = {0.25, 0.5, 0.75, 1};
+const int gampLEN = 4; double gampvals[] = {0.01, 0.03, 0.05, 0.07};
 const int dLEN = 1; double dvals[] = {0.00548};
-const int bLEN = 3; double bvals[] = {50,100,200};
+const int bLEN = 1; double bvals[] = {100};
 
 const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN*bLEN;
 
@@ -47,7 +47,7 @@ const bool VerboseWriteFlag = false;
 char SimName[50] = "E";
 
 std::vector<double> tvVals;
-double TVaccMIN = 8*365; double TVaccMAX = 9*365; 
+double TVaccMIN = 5*365; double TVaccMAX = 6*365; 
 std::vector<double> TVaccStartVals;
 std::vector<double> BpVals;
 std::vector<double> R0pVals;  
@@ -59,7 +59,7 @@ std::vector<double> gampVals;
 std::vector<double> dVals;
 std::vector<double> bVals;
 
-double TMax = 14.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
+double TMax = 11.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
 int SInit = 1000;
 
@@ -158,7 +158,7 @@ int main()
 	    Nv = 0.0; //No vaccination at first
 	    OneSim(0.0, TVaccStart, true);
 	    NFails++;
-	  } while(t < ( TVaccStart) && NFails < 10 ); 
+	  } while(t < ( TVaccStart) && NFails < 1 ); 
 	  //above while: Throw away sims that don't last TVaccstart+tv time, 
 	  //quit after ntrials failures
 
