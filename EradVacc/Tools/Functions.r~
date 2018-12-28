@@ -1,39 +1,94 @@
+### Function to generate transparent colors
+t_col <- function(color, percent = 50, name = NULL) {
+                                        #	  color = color name
+                                        #	percent = % transparency
+                                        #	   name = an optional name for the color
+    ## Get RGB values for named color
+    rgb.val <- col2rgb(color)
+    ## Make new color using input color as base and alpha set by transparency
+    t.col <- rgb(rgb.val[1], rgb.val[2], rgb.val[3],
+                 max = 255,
+                 alpha = (100-percent)*255/100,
+                 names = name)
+    ## Save the color
+    invisible(t.col)    
+}
 
-#h <- function(t,parms){with(parms, b0/(1 + ((t%%T)/tb)^40))}
-h <- function(t,parms){with(parms, b0*(t%%T < tb) )}
 
-rhs.fun = function(t,y,parms){
+rhs.dens.full = function(t,y,parms){
     S <- y[1]
-    Iv <- y[2]
+    Sv <- y[2]
     Ip <- y[3]
     V <- y[4]
     P <- y[5]
     with(parms,{
-        dS = h(t,parms) - Bp*S*Ip - d*S
-        dIv = -(gamv + d)*Iv - Bp*Iv*Ip
-        dIp = Bp*S*Ip + Bp*Iv*Ip - (gamp + d)*Ip
-        dV = gamv*Iv - d*V
+        dS = b*(t%%T < tb) - Bp*S*Ip - d*S
+        dSv = -(gamv + d)*Sv - Bp*Sv*Ip
+        dIp = Bp*S*Ip + Bp*Sv*Ip - (gamp + d)*Ip
+        dV = gamv*Sv - d*V
         dP = gamp*Ip - d*P
         
-        return(list(c(dS,dIv,dIp,dV,dP)))
+        return(list(c(dS,dSv,dIp,dV,dP)))
     })
 }
 
-vaccinate <- function(t,y,parms){
+rhs.freq.full = function(t,y,parms){
     S <- y[1]
-    Iv <- y[2]
+    Sv <- y[2]
     Ip <- y[3]
     V <- y[4]
     P <- y[5]
+    NPop <- sum(y)
     with(parms,{
+        dS = b*(t%%T < tb) - Bp*S*Ip/NPop - d*S
+        dSv = -(gamv + d)*Sv - Bp*Sv*Ip/NPop
+        dIp = (Bp*S*Ip + Bp*Sv*Ip)/NPop - (gamp + d)*Ip
+        dV = gamv*Sv - d*V
+        dP = gamp*Ip - d*P        
+        return(list(c(dS,dSv,dIp,dV,dP)))
+    })
+}
 
-    nvacc <- round(min(S, Nv*S/(S + Iv + Ip + V + P)))
+vaccinate.full <- function(t,y,parms){
+    S <- y[1]
+    Sv <- y[2]
+    Ip <- y[3]
+    V <- y[4]
+    P <- y[5]
+    NPop <- sum(y)
+    with(parms,{
+	nvacc <- min(S, Nv*S/NPop)
 	S   <- S - nvacc
-	Iv  <- Iv + nvacc
-	y <- c(S, Iv, Ip, V, P)
+	Sv  <- Sv + nvacc
+	y <- c(S, Sv, Ip, V, P)
 	return(y)
 	})
 }
 
 
+###Analogous functions with just vaccination (jv)
 
+rhs.jv = function(t,y,parms){
+    S <- y[1]
+    Sv <- y[2]
+    V <- y[3]
+    with(parms,{
+        dS = b*(t%%T < tb) - d*S
+        dSv = -(gamv + d)*Sv
+        dV = gamv*Sv - d*V        
+        return(list(c(dS,dSv,dV)))
+    })
+}
+
+vaccinate.jv = function(t,y,parms){
+    S <- y[1]
+    Sv <- y[2]
+    V <- y[3]
+    NPop <- sum(y)
+    with(parms,{
+        nvacc <- round(min(S, Nv*S/NPop))
+	S   <- S - nvacc
+	Sv  <- Sv + nvacc
+	return(list(c(S, Sv, V)))
+   })
+}

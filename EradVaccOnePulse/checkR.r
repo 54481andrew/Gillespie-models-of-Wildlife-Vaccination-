@@ -1,17 +1,17 @@
-SimName = "DeerMice_Base_LP_Ex";
+SimName = "Temp_Freq"
 parmat = read.table(file = paste("Data/", SimName, "/ParMat", sep=''), header = F)
-names(parmat) = c('Par','b0','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TVaccStart')
+names(parmat) = c('Par','b','d','Bp','Nv','tv','gamv','gamp','tb','T','IpInit', 'TVaccStart', 'NPeak')
 
 if(grepl('Freq',SimName)){
 	parmat$R0p = with(parmat, round( Bp/(d+gamp) ,2))
-	ode.fun = rhs.freq.fun
+	ode.fun = rhs.freq.full
 }else{
-	parmat$R0p = with(parmat, round( Bp*(b0*tb)/(T*d*(d+gamp)) ,2))
-	ode.fun = rhs.fun
+	parmat$R0p = with(parmat, round( Bp*(b*tb)/(T*d*(d+gamp)) ,2))
+	ode.fun = rhs.dens.full
 }
 
-parmat$R0approx = with(parmat, R0p*(1-Nv/(b0*tb + Nv*exp(-d*(T-tv)))))
-parmat$rho = with(parmat, round(Nv/(b0*tb/(d*T)),2))
+parmat$R0approx = with(parmat, R0p*(1-Nv/(b*tb + Nv*exp(-d*(T-tv)))))
+parmat$rho = with(parmat, round(Nv/NPeak,2))
 
 
 require(deSolve)
@@ -21,7 +21,7 @@ times = seq(0,10000)
 
 maxtimes <- 365*11
 timeseq  <- seq(0,maxtimes, by = 0.01)
-NPars = 8#length(parmat$Par)
+NPars = length(parmat$Par)
 
 
 for(i in 1:NPars){
@@ -48,7 +48,7 @@ names(y0) = c('S','Iv','Ip','V','P')
     y0 = out1[nrow(out1), -1]
     y0 = as.numeric(y0)
     parmat$Nv[i] <- NVacc
-    y0 = vaccinate(0,y0,parmat[i,])
+    y0 = vaccinate.full(0,y0,parmat[i,])
     names(y0) = c('S','Iv','Ip','V','P')
     vacctimespost <- vacctimes[vacctimes >= tvaccstart]
     out2 <- data.frame(lsoda(y = y0, times = seq(tvaccstart, maxtimes, by = 1), 
@@ -140,8 +140,8 @@ names(y0) = c('S','Iv','Ip','V','P')
 }
    
 
-
-
+plot(Ip/sum(S + Iv + Ip + V + P)~time,dat[these,], col = 'red', ylim = c(0,1))
+plot((S + Iv + Ip + V + P)/10~time,dat[these,])
 
 
 

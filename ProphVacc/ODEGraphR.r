@@ -1,15 +1,16 @@
-SimName = "LagImport.TMax40.1yr"
+SimName = "d_vs_tb"
 
 filename = paste("ODEData/", SimName, sep = '')
 parmat <- read.table(file = filename, header = T)
+parmat$ls <- 1/parmat$d #Lifespan
 
 XName <- 'tb'
-YName <- 'rho'
+YName <- 'ls'
 XVals  <- unique(parmat[,XName])
-YVals  <- unique(parmat[,YName])
+YVals  <- rev(unique(parmat[,YName]))
 nXVals <- length(XVals)
 nYVals <- length(YVals)
-FixName1 <- 'd'
+FixName1 <- 'rho'
 FixVals1 <- unique(parmat[,FixName1])
 nFixVals <- length(FixVals1)
 
@@ -56,7 +57,7 @@ cols.imp = colorRampPalette(initcols)(nbreaks.imp-1)
             par(mai = c(0.75,0.15,0.15,0.15), omi = c(0,0.75,0,0))
 	    image(x = XVals, y = YVals, z = Lag.Mat, col = cols.lag, breaks = breaks.lag, 
 	    	    xlab = '', ylab = '',
-		    xaxt = 'n', yaxt = 'n', xlim = c(0,365), ylim = c(0,1))
+		    xaxt = 'n', yaxt = 'n', xlim = range(XVals), ylim = range(YVals))
 	    contour(x = XVals, y = YVals, z = Lag.Mat, levels = breaks.lag, add = T, 
 	    	      labcex = 1)
 	    axis(side = 1, labels = T, at = seq(0,365, by = 120))

@@ -22,21 +22,23 @@ EradVaccOnePulse models a single pulse vaccination.
 //**********
 //CONSTANTS
 //**********
-const int NTrials = 500;
+const int NTrials = 100;
 const int TVaccLEN = 1; //TVacc is the year in which vaccination begins
 const int IpInitLEN = 1; int ipinitvals[]={100};
-const int tvLEN = 52; //double tvvals[] = {90.0};
+const int tvLEN = 26; //double tvvals[] = {90.0};
 const int tbLEN = 1; double tbvals[] = {90.0};
 //const int BpLEN = 10; double bpvals[] = {0.0105, 0.0140, 0.0246, 0.0280};
-const int R0pLEN = 4; double r0pvals[] = {1.5, 2, 3};
+const int R0pLEN = 3; double r0pvals[] = {1.1, 2, 5};
 //const int NvLEN = 3; int nvvals[] = {};
-const int RhoLEN = 3; double rhovals[] = {0.5, 1, 1.5};
-const int gampLEN = 2; double gampvals[] = {0.03, 0.05};
-const int dLEN = 3; double dvals[] = {0.00274};
+const int RhoLEN = 1; double rhovals[] = {1.0};
+const int gampLEN = 2; double gampvals[] = {0.01, 0.033};
+const int dLEN = 1; double dvals[] = {0.00548};
+//const int bLEN = 1; //double bvals[] = {100};
+const int npeakLEN = 1; double npeakvals[] = {1000};
 
-const int NParSets = 26*4*3*2*1;
+const int NParSets = tvLEN*tbLEN*R0pLEN*RhoLEN*gampLEN*dLEN*npeakLEN;
 
-const int NumPars = 12; //Number of columns in ParMat
+const int NumPars = 13; //Number of columns in ParMat
 const bool VerboseWriteFlag = false;
 
 //************************
@@ -55,6 +57,8 @@ std::vector<int> IpInitVals;
 std::vector<double> tbVals;
 std::vector<double> gampVals;
 std::vector<double> dVals;
+std::vector<double> bVals;
+std::vector<double> npeakVals;
 
 double TMax = 3.0*365.0; double tick = 1.0; //OneSim writes data at time-intervals tick
 
@@ -74,7 +78,7 @@ char FileNamePar[50];
 char FileNameTExt[50];
 char DirName[50] = "Data/";
 char FileSuffix[50], FileNameDat[50];
-double b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TVaccStart;
+double npeak, b0, tb, T, Nv,tv, b, gamv, R0p, Bp, gamp, d, Event_Rate, Event_Rate_Prod, RandDeath, dTime, t, ti, TVaccStart;
 std::ofstream out_data;
 
 //OTHER VARIABLES
@@ -274,6 +278,8 @@ void Initialize()
 
   dVals.assign(dvals, dvals + dLEN);
 
+  npeakVals.assign(npeakvals, npeakvals + npeakLEN);
+
   //Fill in ParMat
   int i = 0;
   for(int i1=0; i1<tvVals.size(); i1++)
@@ -284,21 +290,26 @@ void Initialize()
 	    for(int i6=0; i6<tbVals.size(); i6++)
 	      for(int i7=0; i7<gampVals.size(); i7++)
 		for(int i8=0; i8<dVals.size(); i8++)
+		  for(int i9=0; i9<npeakVals.size(); i9++)		  
 		  {
+		    npeak = npeakVals[i9];
 		    d = dVals[i8];
+		    tb = tbVals[i6];
+		    b = npeak*(exp(d*(365.0-tb))*(exp(d*tb)-1)/(exp(d*365.0)-1));
 		    gamp = gampVals[i7];
 		    ParMat[i][0] = i; //Par
-		    ParMat[i][1] = 4.0;   //b0
+		    ParMat[i][1] = b;   //b0
 		    ParMat[i][2] = d; //d
 		    ParMat[i][3] = R0pVals[i2]*(d + gamp); //Bp
-		    ParMat[i][4] = RhoVals[i5]*4.0*tbVals[i6]/(365*d); //Nv
+		    ParMat[i][4] = RhoVals[i5]*npeak; //Nv
 		    ParMat[i][5] = tvVals[i1]; //tv
 		    ParMat[i][6] = 0.07; //gamv
 		    ParMat[i][7] = gampVals[i7]; //gamp
-		    ParMat[i][8] = tbVals[i6]; //tb
+		    ParMat[i][8] = tb; //tb
 		    ParMat[i][9] = 365.0; //T
 		    ParMat[i][10] = (double) IpInitVals[i4]; //IpInit
 		    ParMat[i][11] = TVaccStartVals[i3]; //TVaccStart
+		    ParMat[i][12] = npeak; //Peak population size
 		    i++;
 		  }
 }
